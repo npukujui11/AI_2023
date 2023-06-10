@@ -84,8 +84,8 @@ def softmax(x):
 
 def lossFun(inputs, targets):
   """
-  input: inputs,targets为整数列，对应模型的输入与输出结果.
-  output: return 损失、模型参数的梯度。
+  input: `inputs`,`targets`为整数列，对应模型的输入与输出结果.
+  output: return `loss`, `dUx`, `dWx`, `dVx`, `dRx`, `dTx`, `dQx`, `ds1`, `ds2`, `ds3`为损失、模型参数的梯度。
   by Gu Rui
 
   这里实现一个WRNN（一种改进的RNN模型）的损失函数，该模型包含两个隐藏层，分别为a和b，其中a层为RNN，b层为LSTM。
@@ -146,3 +146,4 @@ def lossFun(inputs, targets):
 """
 -------------------------------------------------------------------------------
 """
+
