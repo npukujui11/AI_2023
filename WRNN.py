@@ -151,9 +151,15 @@ def sample(hprev, seed_ix, n):
 ###############
 
 # 模型超参数（要修改的话，请修改这里 by Gu Rui）
-hidden_size = range(50, 1001, 50)  # Hidden layer size
-seq_length = range(25, 101, 10)  # RNN sequence length
-learning_rate = [1e-2, 1e-3, 1e-4, 1e-5]  # Learning rate
+hidden_sizes = range(50, 1001, 50)  # Hidden layer size
+seq_lengths = range(25, 101, 10)  # RNN sequence length
+learning_rates = [1e-2, 1e-3, 1e-4, 1e-5]  # Learning rate
+
+results = []  # 保存每次训练的结果
+
+"""
+-------------------------------------------------------------------------------
+"""
 
 """
 ### 定义超参数
@@ -167,87 +173,115 @@ learning_rate = [1e-2, 1e-3, 1e-4, 1e-5]  # Learning rate
 在实际应用中，学习率一般在 1e-2 到 1e-5 之间。
 """
 
-# 初始化权重矩阵和bias
-Ux = np.random.randn(hidden_size, vocab_size) * 0.01  # 输入到隐藏层a的权重
-Wx = np.random.randn(hidden_size, hidden_size) * 0.01  # 隐藏层a到隐藏层a的权重
-Vx = np.random.randn(hidden_size, hidden_size) * 0.01  # 隐藏层a到隐藏层b的权重
-Rx = np.random.randn(hidden_size, hidden_size) * 0.01  # 隐藏层a到隐藏层b的权重
-Tx = np.random.randn(hidden_size, hidden_size) * 0.01  # 隐藏层b到隐藏层b的权重
-Qx = np.random.randn(vocab_size, hidden_size) * 0.01  # 隐藏层b到输出的权重
-
-s1 = np.zeros((hidden_size, 1))  # 隐藏层a的偏置
-s2 = np.zeros((hidden_size, 1))  # 隐藏层b的偏置
-s3 = np.zeros((vocab_size, 1))  # 输出层的偏置
-
-"""
--------------------------------------------------------------------------------
-"""
-
 ###############
 ###############
 # Model Training #
 ###############
 ###############
 
-# 初始化训练模型
-epoch, p = 0, 0  # 初始化迭代次数和指针
+for hidden_size in hidden_sizes:
+    for seq_length in seq_lengths:
+        for learning_rate in learning_rates:
 
-min_loss = float('inf')  # 初始化最小损失为正无穷大
-min_loss_epoch = 0  # 记录最小损失对应的迭代次数
-no_decrease_count = 0  # 连续损失不减小的计数器
+            # 初始化权重矩阵和bias
+            Ux = np.random.randn(hidden_size, vocab_size) * 0.01  # 输入到隐藏层a的权重
+            Wx = np.random.randn(hidden_size, hidden_size) * 0.01  # 隐藏层a到隐藏层a的权重
+            Vx = np.random.randn(hidden_size, hidden_size) * 0.01  # 隐藏层a到隐藏层b的权重
+            Rx = np.random.randn(hidden_size, hidden_size) * 0.01  # 隐藏层a到隐藏层b的权重
+            Tx = np.random.randn(hidden_size, hidden_size) * 0.01  # 隐藏层b到隐藏层b的权重
+            Qx = np.random.randn(vocab_size, hidden_size) * 0.01  # 隐藏层b到输出的权重
 
-mUx, mWx, mVx, mRx, mTx, mQx = np.zeros_like(Ux), np.zeros_like(Wx), np.zeros_like(Vx), \
-    np.zeros_like(Rx), np.zeros_like(Tx), np.zeros_like(Qx)  # memory variables for Adagrad
-ms1, ms2, ms3 = np.zeros_like(s1), np.zeros_like(s1), np.zeros_like(s3)  # memory variables for Adagrad
+            s1 = np.zeros((hidden_size, 1))  # 隐藏层a的偏置
+            s2 = np.zeros((hidden_size, 1))  # 隐藏层b的偏置
+            s3 = np.zeros((vocab_size, 1))  # 输出层的偏置
 
-smooth_loss = -np.log(1.0 / vocab_size) * seq_length  # loss at iteration 0
+            # 初始化训练模型
+            epoch, p = 0, 0  # 初始化迭代次数和指针
 
-# 训练循环
-while True:
-    # 检查是否需要重置隐藏状态和数据指针
-    if p + seq_length + 1 >= len(data) or epoch == 0:  # 指针到达数据末尾
-        hprev = np.zeros((hidden_size, 1))  # 重置RNN的隐藏状态
-        p = 0  # 回到数据起始位置
+            min_loss = float('inf')  # 初始化最小损失为正无穷大
+            min_loss_epoch = 0  # 记录最小损失对应的迭代次数
+            no_decrease_count = 0  # 连续损失不减小的计数器
 
-    # 从数据中提取输入和目标序列
-    inputs = [char_to_ix[ch] for ch in data[p:p + seq_length]]
-    targets = [char_to_ix[ch] for ch in data[p + 1:p + seq_length + 1]]
+            mUx, mWx, mVx, mRx, mTx, mQx = np.zeros_like(Ux), np.zeros_like(Wx), np.zeros_like(Vx), \
+                np.zeros_like(Rx), np.zeros_like(Tx), np.zeros_like(Qx)  # memory variables for Adagrad
+            ms1, ms2, ms3 = np.zeros_like(s1), np.zeros_like(s1), np.zeros_like(s3)  # memory variables for Adagrad
 
-    # 模型采样
-    if epoch % 100 == 0:
-        sample_ix = sample(hprev, inputs[0], 600)  # 从当前隐藏状态开始采样
-        txt = ''.join(ix_to_char[ix] for ix in sample_ix)  # 将采样的序列转换为文本
-        print('----\n %s \n----' % (txt,))
+            smooth_loss = -np.log(1.0 / vocab_size) * seq_length  # loss at iteration 0
 
-    # 前向传播和反向传播
-    loss, dUx, dWx, dVx, dRx, dTx, dQx, ds1, ds2, ds3 = lossFun(inputs, targets)
+            # 训练循环
+            while True:
+                # 检查是否需要重置隐藏状态和数据指针
+                if p + seq_length + 1 >= len(data) or epoch == 0:  # 指针到达数据末尾
+                    hprev = np.zeros((hidden_size, 1))  # 重置RNN的隐藏状态
+                    p = 0  # 回到数据起始位置
 
-    smooth_loss = smooth_loss * 0.999 + loss * 0.001  # 平滑损失
+                # 从数据中提取输入和目标序列
+                inputs = [char_to_ix[ch] for ch in data[p:p + seq_length]]
+                targets = [char_to_ix[ch] for ch in data[p + 1:p + seq_length + 1]]
 
-    if epoch % 100 == 0:
-        print('epoch %d, loss: %f' % (epoch, smooth_loss))  # 打印损失
+                # 模型采样
+                if epoch % 100 == 0:
+                    sample_ix = sample(hprev, inputs[0], 600)  # 从当前隐藏状态开始采样
+                    txt = ''.join(ix_to_char[ix] for ix in sample_ix)  # 将采样的序列转换为文本
+                    print('----\n %s \n----' % (txt,))
 
-    # 参数更新
-    for param, dparam, mem in zip([Ux, Wx, Vx, Rx, Tx, Qx, s1, s2, s3], [dUx, dWx, dVx, dRx, dTx, dQx, ds1, ds2, ds3]
-            , [mUx, mWx, mVx, mRx, mTx, mQx, ms1, ms2, ms3]):
-        mem += dparam * dparam
-        param += -learning_rate * dparam / np.sqrt(mem + 1e-8)  # Adagrad更新
+                # 前向传播和反向传播
+                loss, dUx, dWx, dVx, dRx, dTx, dQx, ds1, ds2, ds3 = lossFun(inputs, targets)
 
-    p += seq_length  # 移动数据指针
-    epoch += 1  # 迭代计数器
+                smooth_loss = smooth_loss * 0.999 + loss * 0.001  # 平滑损失
 
-    # 检查损失是否不再减小
-    if smooth_loss < min_loss:  # 损失减小
-        min_loss = smooth_loss  # 更新最小损失
-        min_loss_epoch = epoch  # 更新最小损失对应的迭代次数
-        no_decrease_count = 0  # 重置连续损失不减小的计数器
-    else:
-        no_decrease_count += 1  # 连续损失不减小的计数器加1
-    if no_decrease_count >= 1000:  # 连续损失不减小的计数器达到20000
-        break  # 停止训练
+                if epoch % 100 == 0:
+                    print('epoch %d, loss: %f' % (epoch, smooth_loss))  # 打印损失
 
-print("epoch %d, Minimum loss: %f" % (min_loss_epoch, min_loss))  # 打印最小损失对应的迭代次数和最小损失
-print('----\n %s \n----' % (txt,))
+                # 参数更新
+                for param, dparam, mem in zip([Ux, Wx, Vx, Rx, Tx, Qx, s1, s2, s3], [dUx, dWx, dVx, dRx, dTx, dQx, ds1, ds2, ds3]
+                        , [mUx, mWx, mVx, mRx, mTx, mQx, ms1, ms2, ms3]):
+                    mem += dparam * dparam
+                    param += -learning_rate * dparam / np.sqrt(mem + 1e-8)  # Adagrad更新
+
+                p += seq_length  # 移动数据指针
+                epoch += 1  # 迭代计数器
+
+                # 检查损失是否不再减小
+                if smooth_loss < min_loss:  # 损失减小
+                    min_loss = smooth_loss  # 更新最小损失
+                    min_loss_epoch = epoch  # 更新最小损失对应的迭代次数
+                    no_decrease_count = 0  # 重置连续损失不减小的计数器
+                else:
+                    no_decrease_count += 1  # 连续损失不减小的计数器加1
+                if no_decrease_count >= 1000:  # 连续损失不减小的计数器达到20000
+                    break  # 停止训练
+
+            # 保存结果
+            result = {
+                'hidden_size': hidden_size,
+                'seq_length': seq_length,
+                'learning_rate': learning_rate,
+                'min_loss': min_loss,
+                'min_loss_epoch': min_loss_epoch,
+                'txt': txt
+            }
+            results.append(result)
+"""
+-------------------------------------------------------------------------------
+"""
+
+###############
+###############
+# Result #
+###############
+###############
+
+# 输出结果
+for result in results:
+    print("Hidden Size:", result['hidden_size'])
+    print("Seq Length:", result['seq_length'])
+    print("Learning Rate:", result['learning_rate'])
+    print("Minimum Loss:", result['min_loss'])
+    print("Epoch:", result['min_loss_epoch'])
+    print("Text:", result['txt'])
+    print("--------------------")
+
 """
 -------------------------------------------------------------------------------
 """
