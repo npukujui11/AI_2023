@@ -35,7 +35,7 @@ ix_to_char = { i:ch for i,ch in enumerate(chars) } # 将 chars 中的索引 inde
 ###############
 ###############
 
-# 模型超参数（要修改的话，请修改这里 by Ku Jui）
+# 模型超参数（要修改的话，请修改这里 by Gu Rui）
 hidden_size = 100  # Hidden layer size
 seq_length = 25  # RNN sequence length
 learning_rate = 0.1  # Learning rate
@@ -52,6 +52,17 @@ learning_rate = 0.1  # Learning rate
 在实际应用中，学习率一般在 1e-2 到 1e-5 之间。
 """
 
+# 初始化权重矩阵和bias
+Ux = np.random.randn(hidden_size, vocab_size)*0.01 # 输入到隐藏层a的权重
+Wx = np.random.randn(hidden_size, hidden_size)*0.01 # 隐藏层a到隐藏层a的权重
+Vx = np.random.randn(hidden_size, hidden_size)*0.01 # 隐藏层a到隐藏层b的权重
+Rx = np.random.randn(hidden_size, hidden_size)*0.01 # 隐藏层a到隐藏层b的权重
+Tx = np.random.randn(hidden_size, hidden_size)*0.01 # 隐藏层b到隐藏层b的权重
+Qx = np.random.randn(vocab_size, hidden_size)*0.01 # 隐藏层b到输出的权重
+
+s1 = np.zeros((hidden_size, 1)) # 隐藏层a的偏置
+s2 = np.zeros((hidden_size, 1)) # 隐藏层b的偏置
+s3 = np.zeros((vocab_size, 1)) # 输出层的偏置
 
 """
 -------------------------------------------------------------------------------
