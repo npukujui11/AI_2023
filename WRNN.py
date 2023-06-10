@@ -35,9 +35,9 @@ ix_to_char = {i: ch for i, ch in enumerate(chars)}  # 将 chars 中的索引 ind
 ###############
 
 # 模型超参数（要修改的话，请修改这里 by Gu Rui）
-hidden_size = 100  # Hidden layer size
-seq_length = 25  # RNN sequence length
-learning_rate = 0.1  # Learning rate
+hidden_size = 160  # Hidden layer size
+seq_length = 30  # RNN sequence length
+learning_rate = 1e-2  # Learning rate
 
 """
 ### 定义超参数
@@ -244,7 +244,7 @@ while True:
         no_decrease_count = 0  # 重置连续损失不减小的计数器
     else:
         no_decrease_count += 1  # 连续损失不减小的计数器加1
-    if no_decrease_count >= 20000:  # 连续损失不减小的计数器达到20000
+    if no_decrease_count >= 1000:  # 连续损失不减小的计数器达到20000
         break  # 停止训练
 
 print("epoch %d, Minimum loss: %f" % (min_loss_epoch, min_loss))  # 打印最小损失对应的迭代次数和最小损失
