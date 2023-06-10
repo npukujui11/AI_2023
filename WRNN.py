@@ -146,7 +146,7 @@ def sample(hprev, seed_ix, n):
 
 ###############
 ###############
-# Model Initializing #
+# Hyperparameters #
 ###############
 ###############
 
