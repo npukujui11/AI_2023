@@ -188,6 +188,10 @@ def sample(hprev, seed_ix, n):
 # 初始化训练模型
 epoch, p = 0, 0 # 初始化迭代次数和指针
 
+min_loss = float('inf')  # 初始化最小损失为正无穷大
+min_loss_epoch = 0  # 记录最小损失对应的迭代次数
+no_decrease_count = 0  # 连续损失不减小的计数器
+
 mUx, mWx, mVx, mRx, mTx, mQx = np.zeros_like(Ux), np.zeros_like(Wx), np.zeros_like(Vx), \
     np.zeros_like(Rx), np.zeros_like(Tx), np.zeros_like(Qx) # memory variables for Adagrad
 ms1, ms2, ms3 = np.zeros_like(s1), np.zeros_like(s1), np.zeros_like(s3) # memory variables for Adagrad
@@ -228,7 +232,18 @@ while True:
   p += seq_length  # 移动数据指针
   epoch += 1  # 迭代计数器
 
+  # 检查损失是否不再减小
+  if smooth_loss < min_loss: # 损失减小
+      min_loss = smooth_loss # 更新最小损失
+      min_loss_epoch = epoch # 更新最小损失对应的迭代次数
+      no_decrease_count = 0 # 重置连续损失不减小的计数器
+  else:
+      no_decrease_count += 1 # 连续损失不减小的计数器加1
+  if no_decrease_count >= 20000: # 连续损失不减小的计数器达到20000
+      break # 停止训练
 
+print("epoch %d, Minimum loss: %f" %(min_loss_epoch, min_loss)) # 打印最小损失对应的迭代次数和最小损失
+print('----\n %s \n----' % (txt, ))
 """
 -------------------------------------------------------------------------------
 """
