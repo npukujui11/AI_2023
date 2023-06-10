@@ -147,3 +147,34 @@ def lossFun(inputs, targets):
 -------------------------------------------------------------------------------
 """
 
+###############
+###############
+# Result Sampling #
+###############
+###############
+
+# 定义模型的采样参数
+def sample(hprev, seed_ix, n):
+  """
+  input: 从模型中抽取一个整数序列，长度为`n`，`hprev`是前一个时间步的隐藏状态，`seed_ix`是第一个时间步的种子字母。
+  output: 返回一个整数序列
+  by Gu Rui
+  """
+  x = np.zeros((vocab_size, 1)) # 初始化输入
+  x[seed_ix] = 1 # 将第一个时间步的输入置为1
+  ixes = [] # 初始化整数序列
+  a = hprev # 初始化隐藏层a
+  b = hprev # 初始化隐藏层b
+  for t in range(n): # 对序列中的每个字符
+      a = sigmoid(np.dot(Ux, x) + np.dot(Wx, a) + s1) # 计算隐藏层a
+      b = sigmoid(np.dot(Vx, a) + np.dot(Rx, a) + np.dot(Tx, b) + s2) # 计算隐藏层b
+      y = softmax(np.dot(Qx, b) + s3) # 计算输出层
+      ix = np.random.choice(range(vocab_size), p=y.ravel()) # 从输出层中抽取一个整数
+      x = np.zeros((vocab_size, 1)) # 初始化输入
+      x[ix] = 1 # 将当前字符对应的输入置为1
+      ixes.append(ix) # 将抽取的整数添加到整数序列中
+  return ixes # 返回整数序列
+
+"""
+-------------------------------------------------------------------------------
+"""
