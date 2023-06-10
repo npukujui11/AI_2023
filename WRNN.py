@@ -178,3 +178,57 @@ def sample(hprev, seed_ix, n):
 """
 -------------------------------------------------------------------------------
 """
+
+###############
+###############
+# Model Training #
+###############
+###############
+
+# 初始化训练模型
+epoch, p = 0, 0 # 初始化迭代次数和指针
+
+mUx, mWx, mVx, mRx, mTx, mQx = np.zeros_like(Ux), np.zeros_like(Wx), np.zeros_like(Vx), \
+    np.zeros_like(Rx), np.zeros_like(Tx), np.zeros_like(Qx) # memory variables for Adagrad
+ms1, ms2, ms3 = np.zeros_like(s1), np.zeros_like(s1), np.zeros_like(s3) # memory variables for Adagrad
+
+smooth_loss = -np.log(1.0/vocab_size)*seq_length # loss at iteration 0
+
+# 训练循环
+while True:
+  # 检查是否需要重置隐藏状态和数据指针
+  if p + seq_length + 1 >= len(data) or epoch == 0: # 指针到达数据末尾
+    hprev = np.zeros((hidden_size, 1))  # 重置RNN的隐藏状态
+    p = 0  # 回到数据起始位置
+
+  # 从数据中提取输入和目标序列
+  inputs = [char_to_ix[ch] for ch in data[p:p + seq_length]]
+  targets = [char_to_ix[ch] for ch in data[p + 1:p + seq_length + 1]]
+
+  # 模型采样
+  if epoch % 100 == 0:
+    sample_ix = sample(hprev, inputs[0], 600)  # 从当前隐藏状态开始采样
+    txt = ''.join(ix_to_char[ix] for ix in sample_ix)  # 将采样的序列转换为文本
+    print('----\n %s \n----' % (txt, ))
+
+  # 前向传播和反向传播
+  loss, dUx, dWx, dVx, dRx, dTx, dQx, ds1, ds2, ds3 = lossFun(inputs, targets)
+
+  smooth_loss = smooth_loss * 0.999 + loss * 0.001  # 平滑损失
+
+  if epoch % 100 == 0:
+    print('epoch %d, loss: %f' % (epoch, smooth_loss))  # 打印损失
+
+  # 参数更新
+  for param, dparam, mem in zip([Ux, Wx, Vx, Rx, Tx, Qx, s1, s2, s3],[dUx, dWx, dVx, dRx, dTx, dQx, ds1, ds2, ds3]
+          ,[mUx, mWx, mVx, mRx, mTx, mQx, ms1, ms2, ms3]):
+    mem += dparam * dparam
+    param += -learning_rate * dparam / np.sqrt(mem + 1e-8)  # Adagrad更新
+
+  p += seq_length  # 移动数据指针
+  epoch += 1  # 迭代计数器
+
+
+"""
+-------------------------------------------------------------------------------
+"""
