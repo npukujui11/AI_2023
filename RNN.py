@@ -143,6 +143,8 @@ for hidden_size in hidden_sizes:
             min_loss = float('inf')  # 初始化最小损失为正无穷大
             min_loss_epoch = 0  # 记录最小损失对应的迭代次数
             no_decrease_count = 0  # 连续损失不减小的计数器
+            int_no_decrease_count = 0  # 连续整数位没有减少的计数器no_decrease_count = 0  # 连续整数位没有减少的计数器
+            prev_loss = None  # 上一个epoch的整数位损失函数值
 
             mWxh, mWhh, mWhy = np.zeros_like(Wxh), np.zeros_like(Whh), np.zeros_like(Why)
             mbh, mby = np.zeros_like(bh), np.zeros_like(by)  # memory variables for Adagrad
@@ -189,6 +191,18 @@ for hidden_size in hidden_sizes:
                     no_decrease_count += 1  # 连续损失不减小的计数器加1
                 if no_decrease_count >= 1000:  # 连续损失不减小的计数器达到20000
                     break  # 停止训练
+
+                # 判断是否满足终止条件
+                if int_no_decrease_count >= 10000:
+                    break
+
+                # 检查整数位损失函数是否减少
+                if prev_loss is not None and int(smooth_loss) >= int(prev_loss):
+                    no_decrease_count += 1
+                else:
+                    no_decrease_count = 0
+
+                prev_loss = smooth_loss
 
             # 保存结果
             result = {
