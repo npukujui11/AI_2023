@@ -1,0 +1,7 @@
+\contentsline {section}{\numberline {1}第一题：训练RNN模型}{1}{section.1}%
+\contentsline {subsection}{\numberline {1.1}结果说明}{1}{subsection.1.1}%
+\contentsline {subsubsection}{\numberline {1.1.1}代码说明}{1}{subsubsection.1.1.1}%
+\contentsline {subsection}{\numberline {1.2}模型设计}{5}{subsection.1.2}%
+\contentsline {section}{\numberline {2}问题二：实现WRNN模型}{6}{section.2}%
+\contentsline {section}{\numberline {3}问题三：实现WRNN模型}{9}{section.3}%
+\contentsline {section}{\numberline {4}一些说明}{10}{section.4}%
