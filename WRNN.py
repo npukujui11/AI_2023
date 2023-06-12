@@ -151,7 +151,8 @@ def sample(hprev, seed_ix, n):
 ###############
 
 # 模型超参数（要修改的话，请修改这里 by Gu Rui）
-hidden_sizes = range(50, 1001, 50)  # Hidden layer size
+# 需要训练(1000-50)/100+(100-25)/10+4=100+8+4=112次
+hidden_sizes = range(50, 1001, 100)  # Hidden layer size
 seq_lengths = range(25, 101, 10)  # RNN sequence length
 learning_rates = [1e-2, 1e-3, 1e-4, 1e-5]  # Learning rate
 
@@ -197,6 +198,8 @@ for hidden_size in hidden_sizes:
 
             # 初始化训练模型
             epoch, p = 0, 0  # 初始化迭代次数和指针
+            total_iterations = len(hidden_sizes) * len(seq_lengths) * len(learning_rates)  # 总迭代次数
+            current_iteration = 0  # 当前迭代次数
 
             min_loss = float('inf')  # 初始化最小损失为正无穷大
             min_loss_epoch = 0  # 记录最小损失对应的迭代次数
@@ -241,6 +244,18 @@ for hidden_size in hidden_sizes:
 
                 p += seq_length  # 移动数据指针
                 epoch += 1  # 迭代计数器
+
+                # 更新迭代次数
+                current_iteration += 1
+
+                # 计算进度百分比
+                progress = (current_iteration / total_iterations) * 100
+
+                # 计算进度百分比
+                progress = (current_iteration / total_iterations) * 100
+
+                # 打印进度
+                print('Progress: %.2f%%' % progress)
 
                 # 检查损失是否不再减小
                 if smooth_loss < min_loss:  # 损失减小
