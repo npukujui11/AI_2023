@@ -179,6 +179,8 @@ results = []  # 保存每次训练的结果
 # Model Training #
 ###############
 ###############
+total_iterations = len(hidden_sizes) * len(seq_lengths) * len(learning_rates)  # 总迭代次数
+current_iteration = 0  # 当前迭代次数
 
 for hidden_size in hidden_sizes:
     for seq_length in seq_lengths:
@@ -198,8 +200,6 @@ for hidden_size in hidden_sizes:
 
             # 初始化训练模型
             epoch, p = 0, 0  # 初始化迭代次数和指针
-            total_iterations = len(hidden_sizes) * len(seq_lengths) * len(learning_rates)  # 总迭代次数
-            current_iteration = 0  # 当前迭代次数
 
             min_loss = float('inf')  # 初始化最小损失为正无穷大
             min_loss_epoch = 0  # 记录最小损失对应的迭代次数
@@ -210,6 +210,23 @@ for hidden_size in hidden_sizes:
             ms1, ms2, ms3 = np.zeros_like(s1), np.zeros_like(s1), np.zeros_like(s3)  # memory variables for Adagrad
 
             smooth_loss = -np.log(1.0 / vocab_size) * seq_length  # loss at iteration 0
+
+            ###############
+            # Calculate Progress #
+            ###############
+
+            # 更新迭代次数
+            current_iteration += 1
+
+            # 计算进度百分比
+            progress = (current_iteration / total_iterations) * 100
+
+            # 打印进度
+            print('Progress: %.2f%%' % progress)
+
+            """
+            -------------------------------------------------------------------
+            """
 
             # 训练循环
             while True:
@@ -234,6 +251,9 @@ for hidden_size in hidden_sizes:
                 smooth_loss = smooth_loss * 0.999 + loss * 0.001  # 平滑损失
 
                 if epoch % 100 == 0:
+
+                    print('hidden size %d, seq length %d, learning rate %.5f, Progress: %.2f%%'
+                          % (hidden_size,seq_length,learning_rate, progress)) # 打印超参数
                     print('epoch %d, loss: %f' % (epoch, smooth_loss))  # 打印损失
 
                 # 参数更新
@@ -244,18 +264,6 @@ for hidden_size in hidden_sizes:
 
                 p += seq_length  # 移动数据指针
                 epoch += 1  # 迭代计数器
-
-                # 更新迭代次数
-                current_iteration += 1
-
-                # 计算进度百分比
-                progress = (current_iteration / total_iterations) * 100
-
-                # 计算进度百分比
-                progress = (current_iteration / total_iterations) * 100
-
-                # 打印进度
-                print('Progress: %.2f%%' % progress)
 
                 # 检查损失是否不再减小
                 if smooth_loss < min_loss:  # 损失减小
