@@ -58,7 +58,7 @@
 }
 
 %++++++++++++++++++++++++++++++++++++++++
-\titleformat{\section}{\Large\bfseries\songti}{\thesection}{1em}{}
+\titleformat{\section}{\large\bfseries\songti}{\thesection}{1em}{}
 \titleformat{\subsection}{\large\bfseries\songti}{\thesubsection}{1em}{}
 \titleformat{\subsubsection}{\normalsize\bfseries\songti}{\thesubsubsection}{1em}{}
 \titleformat{\paragraph}{\small\bfseries\songti}{\paragraph}{1em}{}
@@ -86,9 +86,9 @@
 	\renewcommand{\tablename}{Table}
 	\tableofcontents  % 自动生成目录
 	
-	\section{Attention exploration}
+	\section{Attention exploration (22 points)}
 	
-	Multi-headed self-attention is the core modeling component of Transformers. In this question, we’ll get some practice working with the self-attention equations, and motivate why multi-headed self-attention can be preferable to single-headed self-attention.
+	\noindent Multi-headed self-attention is the core modeling component of Transformers. In this question, we’ll get some practice working with the self-attention equations, and motivate why multi-headed self-attention can be preferable to single-headed self-attention.
 	Recall that attention can be viewed as an operation on a \textit{query} $q \in \mathbb{R}^d$, a set of \textit{value} vectors $\{v_1, . . . , v_n \}$, $v_i \in
 	\mathbb{R}^d$, and a set of \textit{key} vectors $\{k_1, . . . , k_n\}$, $k_i \in \mathbb{R}^d$, specified as follows:
 	
@@ -111,71 +111,105 @@
 
 	\noindent(a) (4 points) \textbf{Copying in attention.} One advantage of attention is that it’s particularly easy to “copy” a value vector to the output c. In this problem, we’ll motivate why this is the case.
 		
-		\begin{itemize}
-			\item [i.]
-			(1 point) \textbf{Explain} why $\alpha$ can be interpreted as a categorical probability distribution.
+	\begin{itemize}
+	\item [i.]
+	(1 point) \textbf{Explain} why $\alpha$ can be interpreted as a categorical probability distribution.
 			
-			\textcolor{red}{\textbf{Answer:} The alpha weights $\alpha_i$ can be interpreted as a categorical probability distribution because they are obtained by normalizing the exponential values of the inner products between the query vector $q$ and the key vectors $k_i$. This normalization ensures that the alpha weights sum up to 1, making them represent probabilities.}
-		\end{itemize}
-	
-		\begin{itemize}
-			\item [ii.]
-			(2 points) The distribution $\alpha$ is typically relatively “diffuse”; the probability mass is spread out between many different $\alpha_i$. However, this is not always the case. \textbf{Describe} (in one sentence) under what conditions the categorical distribution $\alpha$ puts almost all of its weight on some $\alpha_j$ , where $j \in \{1, \ldots , n\} (i.e. \quad \alpha_j \gg \sum_{i\neq j} \alpha_i)$. What must be true about the query $q$ and/or the keys $\{k_1, \ldots , k_n\}$?
-			
-			\textcolor{red}{\textbf{Answer:} The categorical distribution $\alpha$ puts almost all of its weight on some $\alpha_j$ when there is a strong alignment between the query vector $q$ and a specific key vector $k_j$. This occurs when the inner product $k_j^Tq$ is much larger than the inner products $k_i^Tq$ for $i\neq j$.}
-		\end{itemize}
+	\textcolor{red}{\textbf{Answer:} The alpha weights $\alpha_i$ can be interpreted as a categorical probability distribution because they are obtained by normalizing the exponential values of the inner products between the query vector $q$ and the key vectors $k_i$. This normalization ensures that the alpha weights sum up to 1, making them represent probabilities.}
 
-		\begin{itemize}
-			\item [iii.]
-			(1 point) Under the conditions you gave in (ii), \textbf{describe} what properties the output c might have.
+	\item [ii.]
+	(2 points) The distribution $\alpha$ is typically relatively “diffuse”; the probability mass is spread out between many different $\alpha_i$. However, this is not always the case. \textbf{Describe} (in one sentence) under what conditions the categorical distribution $\alpha$ puts almost all of its weight on some $\alpha_j$ , where $j \in \{1, \ldots , n\} (i.e. \quad \alpha_j \gg \sum_{i\neq j} \alpha_i)$. What must be true about the query $q$ and/or the keys $\{k_1, \ldots , k_n\}$?
 			
-			\textcolor{red}{\textbf{Answer:} Under the conditions described in (ii), the output vector $c$ will be heavily influenced by the value vector $v_j$ associated with the key vector $k_j$ that received the majority of the attention weight. The contribution of other value vectors to the output will be relatively small.}
-		\end{itemize}
+	\textcolor{red}{\textbf{Answer:} The categorical distribution $\alpha$ puts almost all of its weight on some $\alpha_j$ when there is a strong alignment between the query vector $q$ and a specific key vector $k_j$. This occurs when the inner product $k_j^Tq$ is much larger than the inner products $k_i^Tq$ for $i\neq j$.}
 
-		\begin{itemize}
-			\item [iv.]
-			(1 point) \textbf{Explain} (in two sentences or fewer) what your answer to (ii) and (iii) means intuitively.
+	\item [iii.]
+	(1 point) Under the conditions you gave in (ii), \textbf{describe} what properties the output c might have.
 			
-			\textcolor{red}{\textbf{Answer:} This means that in multi-headed self-attention, where multiple attention heads are used, each head can attend to different aspects or features of the input. When a single head receives a significantly higher attention weight, it indicates that it is focusing on a specific important aspect. By using multiple attention heads, the model can simultaneously capture and attend to different relevant information, leading to richer and more comprehensive representations.}
-		\end{itemize}	
+	\textcolor{red}{\textbf{Answer:} Under the conditions described in (ii), the output vector $c$ will be heavily influenced by the value vector $v_j$ associated with the key vector $k_j$ that received the majority of the attention weight. The contribution of other value vectors to the output will be relatively small.}
+
+    \item [iv.]
+	(1 point) \textbf{Explain} (in two sentences or fewer) what your answer to (ii) and (iii) means intuitively.
+			
+	\textcolor{red}{\textbf{Answer:} This means that in multi-headed self-attention, where multiple attention heads are used, each head can attend to different aspects or features of the input. When a single head receives a significantly higher attention weight, it indicates that it is focusing on a specific important aspect. By using multiple attention heads, the model can simultaneously capture and attend to different relevant information, leading to richer and more comprehensive representations.}
+	\end{itemize}	
 		
 	\noindent(b) (7 points) \textbf{An average of two}. Instead of focusing on just one vector $v_j$ , a Transformer model might want to incorporate information from \textit{multiple} source vectors. Consider the case where we instead want to incorporate information from \textbf{two} vectors $v_a$ and $v_b$, with corresponding key vectors $k_a$ and $k_b$.
 	
-		\begin{itemize}
-			\item [i.]
-			(3 points) How should we combine two d-dimensional vectors $v_a$, $v_b$ into one output vector $c$ in a way that preserves information from both vectors? In machine learning, one common way to do so is to take the average:  $c = \frac{1}{2}(v_a + v_b)$. It might seem hard to extract information about the original vectors va and $v_b$ from the resulting $c$, but under certain conditions one can do so.
-			In this problem, we’ll see why this is the case.
+	\begin{itemize}
+	\item [i.]
+	(3 points) How should we combine two d-dimensional vectors $v_a$, $v_b$ into one output vector $c$ in a way that preserves information from both vectors? In machine learning, one common way to do so is to take the average:  $c = \frac{1}{2}(v_a + v_b)$. It might seem hard to extract information about the original vectors va and $v_b$ from the resulting $c$, but under certain conditions one can do so.
+	In this problem, we’ll see why this is the case.
 			
-			\vspace{1em}
+	\vspace{1em}
 			
-			Suppose that although we don’t know $v_a$ or $v_b$, we do know that $v_a$ lies in a subspace $A$ formed by the $m$ basis vectors $\{a_1, a_2, \ldots , a_m\}$, while $v_b$ lies in a subspace $B$ formed by the $p$ basis vectors $\{b_1, b_2, \ldots , b_p\}$. (This means that any va can be expressed as a linear combination of its basis vectors, as can $v_b$. All basis vectors have norm 1 and orthogonal to each other.)
+	Suppose that although we don’t know $v_a$ or $v_b$, we do know that $v_a$ lies in a subspace $A$ formed by the $m$ basis vectors $\{a_1, a_2, \ldots , a_m\}$, while $v_b$ lies in a subspace $B$ formed by the $p$ basis vectors $\{b_1, b_2, \ldots , b_p\}$. (This means that any va can be expressed as a linear combination of its basis vectors, as can $v_b$. All basis vectors have norm 1 and orthogonal to each other.)
 			
-			Additionally, suppose that the two subspaces are orthogonal; i.e. $a^\top_j b_k = 0$ for all $j$, $k$.
-			Using the basis vectors $\{a_1, a_2, \ldots , a_m\}$, construct a matrix $M$ such that for arbitrary vectors $v_a \in A$ and $v_b \in B$, we can use $M$ to extract $v_a$ from the sum vector $s = v_a + v_b$. In other words, we want to construct $M$ such that for any $v_a$, $v_b$, $M_s = v_a$.
+	Additionally, suppose that the two subspaces are orthogonal; i.e. $a^\top_j b_k = 0$ for all $j$, $k$.
+	Using the basis vectors $\{a_1, a_2, \ldots , a_m\}$, construct a matrix $M$ such that for arbitrary vectors $v_a \in A$ and $v_b \in B$, we can use $M$ to extract $v_a$ from the sum vector $s = v_a + v_b$. In other words, we want to construct $M$ such that for any $v_a$, $v_b$, $M_s = v_a$.
 			
-			\textbf{Note:} both $M$ and $v_a$, $v_b$ should be expressed as a vector in $\mathbb{R}^d$, not in terms of vectors from $A$ and $B$.
+	\textbf{Note:} both $M$ and $v_a$, $v_b$ should be expressed as a vector in $\mathbb{R}^d$, not in terms of vectors from $A$ and $B$.
 			
-			\textbf{Hint:} Given that the vectors $\{a_1, a_2, \ldots , a_m\}$ are both \textit{orthogonal} and \textit{form a basis} for $v_a$, we know that there exist some $c_1, c_2, \ldots , c_m$ such that $v_a = c_1a_1 + c_2a_2 + \ldots + c_ma_m$. Can you create a vector of these weights $c$?
+	\textbf{Hint:} Given that the vectors $\{a_1, a_2, \ldots , a_m\}$ are both \textit{orthogonal} and \textit{form a basis} for $v_a$, we know that there exist some $c_1, c_2, \ldots , c_m$ such that $v_a = c_1a_1 + c_2a_2 + \ldots + c_ma_m$. Can you create a vector of these weights $c$?
 			
-			\textcolor{red}{\textbf{Answer:} }
+	\textcolor{red}{\textbf{Answer:} }
 			
 			
-			\item[ii.]
-			(4 points) As before, let $v_a$ and $v_b$ be two value vectors corresponding to key vectors $k_a$ and $k_b$, respectively. Assume that (1) all key vectors are orthogonal, so $k_i^\top k_j$ for all $i \neq j$; and (2) all key vectors have norm 1.\footnote{Recall that a vector x has norm 1 if $x^{\top}x = 1$.} \textbf{Find an expression} for a query vector $q$ such that $c \approx \frac{1}{2}(v_a +v_b)$.\footnote{Hint: while the softmax function will never exactly average the two vectors, you can get close by using a large scalar multiple in the expression.}
-		\end{itemize}	
+	\item[ii.]
+	(4 points) As before, let $v_a$ and $v_b$ be two value vectors corresponding to key vectors $k_a$ and $k_b$, respectively. Assume that (1) all key vectors are orthogonal, so $k_i^\top k_j$ for all $i \neq j$; and (2) all key vectors have norm 1.\footnote{Recall that a vector x has norm 1 if $x^{\top}x = 1$.} \textbf{Find an expression} for a query vector $q$ such that $c \approx \frac{1}{2}(v_a +v_b)$.\footnote{Hint: while the softmax function will never exactly average the two vectors, you can get close by using a large scalar multiple in the expression.}
+	\end{itemize}	
 		
 		
+	\noindent(c) (5 points) \textbf{Drawbacks of single-headed attention:} In the previous part, we saw how it was \textit{possible} for a single-headed attention to focus equally on two values. The same concept could easily be extended to any subset of values. In this question we’ll see why it’s not a practical solution. Consider a set of key vectors $\{k_1, \ldots , k_n\}$ that are now randomly sampled, $k_i \sim \mathcal{N}(μ_i,\Sigma_i)$, where the means $μ_i \in \mathbb{R}^d$ are known to you, but the covariances $\Sigma_i$ are unknown. Further, assume that the means $μ_i$ are all perpendicular; $\mu^\top_i \mu_j = 0$ if $i \neq j$, and unit norm, $\|\mu_i\| = 1$.
 	
+	\begin{itemize}
+	\item[i.]
+	(2 points) Assume that the covariance matrices are $\Sigma_i = \alpha I \forall i \in {1, 2, \ldots , n}$, for vanishingly small $\alpha$. Design a query $q$ in terms of the $\mu_i$ such that as before, $c \approx \frac{1}{2}(v_a +v_b)$, and provide a brief argument as to why it works.
+		
+	\item[ii.]
+	(3 points) Though single-headed attention is resistant to small perturbations in the keys, some types of larger perturbations may pose a bigger issue. Specifically, in some cases, one key vector $k_a$ may be larger or smaller in norm than the others, while still pointing in the same direction as $\mu_a$. As an example, let us consider a covariance for item $a$ as $\Sigma_a = \alpha I+ \frac{1}{2}(\mu_a\mu^\top_a )$ for vanishingly small $\alpha$ (as shown in Fig. \ref{fig: vector}). This causes $k_a$ to point in roughly the same direction as $\mu_a$, but with large variances in magnitude. Further, let $\Sigma_i = \alpha I$ for all $i \neq a$.
+		
+	\begin{figure}[htbp] 
+		% read manual to see what [ht] means and for other possible options
+		\centering 
+		% \includegraphics[width=0.8\columnwidth]{GLADNet}
+		\includegraphics[width=0.5\linewidth]{vector}
+		\captionsetup{font=small}
+		\label{vector}
+		\caption{
+			\label{fig: vector} % spaces are big no-no withing labels
+			% things like fig: are optional in the label but it helps
+			% to orient yourself when you have multiple figures,
+			% equations and tables
+			The vector $\mu_a$ (shown here in 2D as an example), with the range of possible values of $k_a$ shown in red. As mentioned previously, $k_a$ points in roughly the same direction as $\mu_a$, but may have larger or smaller magnitude.
+		}
+	\end{figure}
+		
+	When you sample $\{k_1, \ldots , k_n\}$ multiple times, and use the $q$ vector that you defined in part i., what qualitatively do you expect the vector $c$ will look like for different samples?
 
-			
+	\end{itemize}	
+	
+	\noindent(d) (3 points) \textit{Benefits of multi-headed attention:} Now we’ll see some of the power of multi-headed attention. We’ll consider a simple version of multi-headed attention which is identical to single-headed self-attention as we’ve presented it in this homework, except two query vectors ($q_1$ and $q_2$) are defined, which leads to a pair of vectors ($c_1$ and $c_2$), each the output of single-headed attention given its respective query vector. The final output of the multi-headed attention is their average,$\frac{1}{2}(c_1+c_2)$. As in question 1(c), consider a set of key vectors $\{k_1, \ldots , k_n}$ that are randomly sampled, $k_i \sim \mathcal{N} (\mu_i
+	, \Sigma_i)$, where the means $\mu_i$ are known to you, but the covariances $\Sigma_i$ are unknown. Also as before,	assume that the means µi are mutually orthogonal; $\mu^\top_i \mu_j = 0$ if $i \neq j$, and unit norm,$\|\mu_i\|= 1$.
+	
+	\begin{itemize}
+	\item[i.] 
+	(1 point) Assume that the covariance matrices are $\Sigma_i = \alpha I$, for vanishingly small $\alpha$. Design $q_1$
+	and $q_2$ such that $c$ is approximately equal to $\frac{1}{2}(v_a + v_b)$.
+	
+	\item[ii.] 
+	(2 points) Assume that the covariance matrices are $\Sigma_a = \alpha I + \frac{1}{2}(\mu_a \mu_a^\top)$ for vanishingly small $\alpha$, and $\Sigma_i = \alpha I$ for all $i \neq a$. Take the query vectors $q_1$ and $q_2$ that you designed in part i.
+	
+	What, qualitatively, do you expect the output $c$ to look like across different samples of the key
+	vectors? Please briefly explain why. You can ignore cases in which $k^\top_a q_i < 0$.
+	\end{itemize}	
 	
 	\section{Pretrained Transformer models and knowledge access (35 points)}
 	
-	You’ll train a Transformer to perform a task that involves accessing knowledge about the world – knowledge which isn’t provided via the task’s training data (at least if you want to generalize outside the training set). You’ll find that it more or less fails entirely at the task. You’ll then learn how to pretrain that Transformer on Wikipedia text that contains world knowledge, and find that finetuning that Transformer on the same knowledge-intensive task enables the model to access some of the knowledge learned at pretraining time. You’ll find that this enables models to perform considerably above chance on a held out development set.
+	\noindent You’ll train a Transformer to perform a task that involves accessing knowledge about the world – knowledge which isn’t provided via the task’s training data (at least if you want to generalize outside the training set). You’ll find that it more or less fails entirely at the task. You’ll then learn how to pretrain that Transformer on Wikipedia text that contains world knowledge, and find that finetuning that Transformer on the same knowledge-intensive task enables the model to access some of the knowledge learned at pretraining time. You’ll find that this enables models to perform considerably above chance on a held out development set.
 	
-	The code you’re provided with is a fork of Andrej Karpathy’s \textcolor{blue}{minGPT}. It’s nicer than most research code in that it’s relatively simple and transparent. The “GPT” in minGPT refers to the Transformer language model of OpenAI, originally described in \textcolor{blue}{this paper} \cite{b1}.
+	\noindent The code you’re provided with is a fork of Andrej Karpathy’s \textcolor{blue}{minGPT}. It’s nicer than most research code in that it’s relatively simple and transparent. The “GPT” in minGPT refers to the Transformer language model of OpenAI, originally described in \textcolor{blue}{this paper} \cite{b1}.
 	
-	As in previous assignments, you will want to develop on your machine locally, then run training on HuaWei Could. You’ll need around 5 hours for training, so budget your time accordingly!
+	\noindent As in previous assignments, you will want to develop on your machine locally, then run training on HuaWei Could. You’ll need around 5 hours for training, so budget your time accordingly!
 	
 	\begin{figure}[htbp] 
 		% read manual to see what [ht] means and for other possible options
