@@ -112,35 +112,53 @@
 	
 		\begin{itemize}
 			\item [ii.]
-			(2 points) The distribution $\alpha$ is typically relatively “diffuse”; the probability mass is spread out between many different $\alpha_i$. However, this is not always the case. \textit{Describe} (in one sentence) under what conditions the categorical distribution $\alpha$ puts almost all of its weight on some $\alpha_j$ , where $j \in \{1, . . . , n\} (i.e. \quad \alpha_j ≫ \sum_{i=j} \alpha_i)$. What must be true about the query $q$ and/or the keys $\{k1, . . . , kn\}$?
+			(2 points) The distribution $\alpha$ is typically relatively “diffuse”; the probability mass is spread out between many different $\alpha_i$. However, this is not always the case. \textbf{Describe} (in one sentence) under what conditions the categorical distribution $\alpha$ puts almost all of its weight on some $\alpha_j$ , where $j \in \{1, \ldots , n\} (i.e. \quad \alpha_j \gg \sum_{i\neq j} \alpha_i)$. What must be true about the query $q$ and/or the keys $\{k_1, \ldots , k_n\}$?
 			
-			\textcolor{red}{\textbf{Answer:} The categorical distribution $\alpha$ puts almost all of its weight on some $\alpha_j$ when the inner product $k_j^Tq$ is significantly larger than the inner products $k_i^Tq$ for $i\neq j$. In other words, when there is a strong alignment or similarity between the query vector $q$ and a specific key vector $k_j$, the corresponding attention weight $\alpha_j$ becomes much larger compared to the other attention weights.}
+			\textcolor{red}{\textbf{Answer:} The categorical distribution $\alpha$ puts almost all of its weight on some $\alpha_j$ when there is a strong alignment between the query vector $q$ and a specific key vector $k_j$. This occurs when the inner product $k_j^Tq$ is much larger than the inner products $k_i^Tq$ for $i\neq j$.}
 		\end{itemize}
 
 		\begin{itemize}
 			\item [iii.]
-			(1 point) Under the conditions you gave in (ii), \textit{describe} what properties the output c might have.
+			(1 point) Under the conditions you gave in (ii), \textbf{describe} what properties the output c might have.
 			
-			\textcolor{red}{\textbf{Answer:} Under the conditions described in (ii), the output vector $c$ will be dominated by the value vector $v_j$ associated with the key vector $k_j$ that received the majority of the attention weight. The contribution of other value vectors to the output will be relatively small.}
+			\textcolor{red}{\textbf{Answer:} Under the conditions described in (ii), the output vector $c$ will be heavily influenced by the value vector $v_j$ associated with the key vector $k_j$ that received the majority of the attention weight. The contribution of other value vectors to the output will be relatively small.}
 		\end{itemize}
 
 		\begin{itemize}
 			\item [iv.]
-			iv. (1 point) \textbf{Explain} (in two sentences or fewer) what your answer to (ii) and (iii) means intuitively.
+			(1 point) \textbf{Explain} (in two sentences or fewer) what your answer to (ii) and (iii) means intuitively.
 			
 			\textcolor{red}{\textbf{Answer:} This means that in multi-headed self-attention, where multiple attention heads are used, each head can attend to different aspects or features of the input. When a single head receives a significantly higher attention weight, it indicates that it is focusing on a specific important aspect. By using multiple attention heads, the model can simultaneously capture and attend to different relevant information, leading to richer and more comprehensive representations.}
-		\end{itemize}
+		\end{itemize}	
 		
+	\noindent(b) (7 points) \textbf{An average of two}. Instead of focusing on just one vector $v_j$ , a Transformer model might want to incorporate information from \textit{multiple} source vectors. Consider the case where we instead want to incorporate information from \textbf{two} vectors $v_a$ and $v_b$, with corresponding key vectors $k_a$ and $k_b$.
+	
+		\begin{itemize}
+			\item [i.]
+			(3 points) How should we combine two d-dimensional vectors $v_a$, $v_b$ into one output vector $c$ in a way that preserves information from both vectors? In machine learning, one common way to do so is to take the average:  $c = \frac{1}{2}(v_a + v_b)$. It might seem hard to extract information about the original vectors va and $v_b$ from the resulting $c$, but under certain conditions one can do so.
+			In this problem, we’ll see why this is the case.
+			
+			\vspace{1em}
+			
+			Suppose that although we don’t know $v_a$ or $v_b$, we do know that $v_a$ lies in a subspace $A$ formed by the $m$ basis vectors $\{a_1, a_2, \ldots , a_m\}$, while $v_b$ lies in a subspace $B$ formed by the $p$ basis vectors $\{b_1, b_2, \ldots , b_p\}$. (This means that any va can be expressed as a linear combination of its basis vectors, as can $v_b$. All basis vectors have norm 1 and orthogonal to each other.)
+			
+			Additionally, suppose that the two subspaces are orthogonal; i.e. $a^\top_j b_k = 0$ for all $j$, $k$.
+			Using the basis vectors $\{a_1, a_2, \ldots , a_m\}$, construct a matrix $M$ such that for arbitrary vectors $v_a \in A$ and $v_b \in B$, we can use $M$ to extract $v_a$ from the sum vector $s = v_a + v_b$. In other words, we want to construct $M$ such that for any $v_a$, $v_b$, $M_s = v_a$.
+			
+			\textbf{Note:} both $M$ and $v_a$, $v_b$ should be expressed as a vector in $\mathbb{R}^d$, not in terms of vectors from $A$ and $B$.
+			
+			\textbf{Hint:} Given that the vectors $\{a_1, a_2, \ldots , a_m\}$ are both \textit{orthogonal} and \textit{form a basis} for $v_a$, we know that there exist some $c_1, c_2, \ldots , c_m$ such that $v_a = c_1a_1 + c_2a_2 + \ldots + c_ma_m$. Can you create a vector of these weights $c$?
+			
+			\textcolor{red}{\textbf{Answer:} }
+			
+			
+			\item[ii.]
+			(4 points) As before, let $v_a$ and $v_b$ be two value vectors corresponding to key vectors $k_a$ and $k_b$, respectively. Assume that (1) all key vectors are orthogonal, so $k_i^\top k_j$ for all $i \neq j$; and (2) all key vectors have norm 1.\footnote{Recall that a vector x has norm 1 if $x^{\top}x = 1$.} \textbf{Find an expression} for a query vector $q$ such that $c \approx \frac{1}{2}(v_a +v_b)$.\footnote{Hint: while the softmax function will never exactly average the two vectors, you can get close by using a large scalar multiple in the expression.}
+		\end{itemize}	
 		
 		
 	
-		
-		
-		
-	\noindent(b) (7 points) An average of two. Instead of focusing on just one vector $v_j$ , a Transformer model might want to incorporate information from \textit{multiple} source vectors. Consider the case where we instead want to incorporate information from \textbf{two} vectors $v_a$ and $v_b$, with corresponding key vectors $k_a$ and $k_b$.
-	
-	
-	
+
 			
 	
 	\section{Pretrained Transformer models and knowledge access (35 points)}

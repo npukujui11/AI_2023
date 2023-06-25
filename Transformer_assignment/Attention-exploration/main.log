@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023) (preloaded format=xelatex 2023.4.2)  25 JUN 2023 14:11
+This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023) (preloaded format=xelatex 2023.4.2)  25 JUN 2023 15:53
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -870,10 +870,7 @@ Missing character: There is no α ("3B1) in font cmmi12!
 Missing character: There is no α ("3B1) in font cmmi12!
 [1
 
-]
-Missing character: There is no ≫ (U+226B) in font [lmroman12-regular]:mapping=t
-ex-text;!
-[2]
+] [2] [3]
 File: network.jpg Graphic file (type bmp)
 <network.jpg>
 File: WRNN/parameter_tuning.jpg Graphic file (type bmp)
@@ -888,14 +885,15 @@ File: WRNN/result_3.jpg Graphic file (type bmp)
 <WRNN/result_3.jpg>
 File: WRNN/result_4.jpg Graphic file (type bmp)
 <WRNN/result_4.jpg>
- [3] [4]
+
 
 LaTeX Font Warning: Font shape `TU/SimSun(1)/b/n' undefined
-(Font)              using `TU/SimSun(1)/m/n' instead on input line 224.
+(Font)              using `TU/SimSun(1)/m/n' instead on input line 242.
 
+[4] [5]
 File: train.jpg Graphic file (type bmp)
 <train.jpg>
-[5] [6] (./main.aux)
+ [6] [7] (./main.aux)
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
@@ -905,10 +903,10 @@ Package rerunfilecheck Info: File `main.out' has not changed.
 Here is how much of TeX's memory you used:
  20362 strings out of 476683
  420490 string characters out of 5805371
- 1857012 words of memory out of 5000000
+ 1860012 words of memory out of 5000000
  40275 multiletter control sequences out of 15000+600000
  522434 words of font info for 99 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  89i,8n,97p,723b,558s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on main.pdf (6 pages).
+Output written on main.pdf (7 pages).
