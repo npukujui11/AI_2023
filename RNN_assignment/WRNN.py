@@ -151,7 +151,8 @@ def sample(hprev, seed_ix, n):
 ###############
 
 # 模型超参数（要修改的话，请修改这里 by Gu Rui）
-hidden_sizes = range(50, 1001, 50)  # Hidden layer size
+# 需要训练(1000-50)/100+(100-25)/10+4=100+8+4=112次
+hidden_sizes = range(50, 1001, 100)  # Hidden layer size
 seq_lengths = range(25, 101, 10)  # RNN sequence length
 learning_rates = [1e-2, 1e-3, 1e-4, 1e-5]  # Learning rate
 
@@ -178,6 +179,8 @@ results = []  # 保存每次训练的结果
 # Model Training #
 ###############
 ###############
+total_iterations = len(hidden_sizes) * len(seq_lengths) * len(learning_rates)  # 总迭代次数
+current_iteration = 0  # 当前迭代次数
 
 for hidden_size in hidden_sizes:
     for seq_length in seq_lengths:
@@ -208,6 +211,23 @@ for hidden_size in hidden_sizes:
 
             smooth_loss = -np.log(1.0 / vocab_size) * seq_length  # loss at iteration 0
 
+            ###############
+            # Calculate Progress #
+            ###############
+
+            # 更新迭代次数
+            current_iteration += 1
+
+            # 计算进度百分比
+            progress = (current_iteration / total_iterations) * 100
+
+            # 打印进度
+            print('Progress: %.2f%%' % progress)
+
+            """
+            -------------------------------------------------------------------
+            """
+
             # 训练循环
             while True:
                 # 检查是否需要重置隐藏状态和数据指针
@@ -231,6 +251,9 @@ for hidden_size in hidden_sizes:
                 smooth_loss = smooth_loss * 0.999 + loss * 0.001  # 平滑损失
 
                 if epoch % 100 == 0:
+
+                    print('hidden size %d, seq length %d, learning rate %.5f, Progress: %.2f%%'
+                          % (hidden_size,seq_length,learning_rate, progress)) # 打印超参数
                     print('epoch %d, loss: %f' % (epoch, smooth_loss))  # 打印损失
 
                 # 参数更新
