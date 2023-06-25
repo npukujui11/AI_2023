@@ -115,22 +115,22 @@
 	\item [i.]
 	(1 point) \textbf{Explain} why $\alpha$ can be interpreted as a categorical probability distribution.
 			
-	\textcolor{red}{\textbf{Answer:} The alpha weights $\alpha_i$ can be interpreted as a categorical probability distribution because they are obtained by normalizing the exponential values of the inner products between the query vector $q$ and the key vectors $k_i$. This normalization ensures that the alpha weights sum up to 1, making them represent probabilities.}
+	\textcolor{red}{\textbf{Answer:} Eq.\ref{eq: Attention_formula_1} has shown that this is a fuzzy query, and we cannot directly match a key vector k with the query vector $q$, and can only give each key a certain probability distribution weight (i.e. $\alpha_{ij}$) to get the final output result.}
 
 	\item [ii.]
 	(2 points) The distribution $\alpha$ is typically relatively “diffuse”; the probability mass is spread out between many different $\alpha_i$. However, this is not always the case. \textbf{Describe} (in one sentence) under what conditions the categorical distribution $\alpha$ puts almost all of its weight on some $\alpha_j$ , where $j \in \{1, \ldots , n\} (i.e. \quad \alpha_j \gg \sum_{i\neq j} \alpha_i)$. What must be true about the query $q$ and/or the keys $\{k_1, \ldots , k_n\}$?
 			
-	\textcolor{red}{\textbf{Answer:} The categorical distribution $\alpha$ puts almost all of its weight on some $\alpha_j$ when there is a strong alignment between the query vector $q$ and a specific key vector $k_j$. This occurs when the inner product $k_j^Tq$ is much larger than the inner products $k_i^Tq$ for $i\neq j$.}
+	\textcolor{red}{\textbf{Answer:} According to the calculation method of Eq.\ref{eq: Attention_formula_2}, if the query vector $q$ has a very high similarity to a key $k_i$ (the dot product is large), and $q$ is basically vertical to other bonds (the point product is zero), then $\alpha_i$ will be maximized.}
 
 	\item [iii.]
 	(1 point) Under the conditions you gave in (ii), \textbf{describe} what properties the output c might have.
 			
-	\textcolor{red}{\textbf{Answer:} Under the conditions described in (ii), the output vector $c$ will be heavily influenced by the value vector $v_j$ associated with the key vector $k_j$ that received the majority of the attention weight. The contribution of other value vectors to the output will be relatively small.}
+	\textcolor{red}{\textbf{Answer:} Under the conditions described in (ii), the output vector $c$ will be heavily influenced by the value vector $v_j$ associated with the key vector $k_j$ that received the majority of the attention weight. At this point, the $c$ is approximately equal to $v_i$}
 
     \item [iv.]
 	(1 point) \textbf{Explain} (in two sentences or fewer) what your answer to (ii) and (iii) means intuitively.
 			
-	\textcolor{red}{\textbf{Answer:} This means that in multi-headed self-attention, where multiple attention heads are used, each head can attend to different aspects or features of the input. When a single head receives a significantly higher attention weight, it indicates that it is focusing on a specific important aspect. By using multiple attention heads, the model can simultaneously capture and attend to different relevant information, leading to richer and more comprehensive representations.}
+	\textcolor{red}{\textbf{Answer:} When the dot product (similarity) between a specific word key and a query significantly outweighs the dot products of other word keys with the same query, the attention output corresponding to that specific word will closely resemble its associated value. This behavior can be likened to "copying" the value into the output.}
 	\end{itemize}	
 		
 	\noindent(b) (7 points) \textbf{An average of two}. Instead of focusing on just one vector $v_j$ , a Transformer model might want to incorporate information from \textit{multiple} source vectors. Consider the case where we instead want to incorporate information from \textbf{two} vectors $v_a$ and $v_b$, with corresponding key vectors $k_a$ and $k_b$.
@@ -151,14 +151,87 @@
 			
 	\textbf{Hint:} Given that the vectors $\{a_1, a_2, \ldots , a_m\}$ are both \textit{orthogonal} and \textit{form a basis} for $v_a$, we know that there exist some $c_1, c_2, \ldots , c_m$ such that $v_a = c_1a_1 + c_2a_2 + \ldots + c_ma_m$. Can you create a vector of these weights $c$?
 			
-	\textcolor{red}{\textbf{Answer:} }
+	\textcolor{red}{\textbf{Answer:} Assume that $A$ is a matrix of concatenated basis vectors $\{\mathbf{a}_1, \mathbf{a}_2,\ldots, \mathbf{a}_m\}$ and $B$ is a matrix of concatenated basis vector $\{\mathbf{b}_1, \mathbf{b}_2,\ldots, \mathbf{b}_p\}$.  Linear combinations of vectors $v_a$ and $v_b$ can then be expressed as:
+	\begin{equation*}
+		\begin{aligned}
+			\mathbf{v}_a=c_1\mathbf{a}_1+c_2\mathbf{a}_2+ \ldots + c_m\mathbf{a}_m = \sum_{i=1}^{m} c_i\mathbf{a}_i = A\mathbf{c}
+		\end{aligned}
+		\label{eq: ai_vector-weighted_sum}
+	\end{equation*}
+	\begin{equation*}
+		\begin{aligned}
+			\mathbf{v}_b=d_1\mathbf{b}_1+d_2\mathbf{b}_2+ \ldots + d_p\mathbf{b}_m = \sum_{j=1}^{p} d_j\mathbf{b}_j = B\mathbf{d}
+		\end{aligned}
+		\label{eq: bj_vector-weighted_sum}
+	\end{equation*}
+	We need to construct such $M$ which, when multiplied with $\mathbf{v}_b$, produces $\mathbf{0}$ and, when multiplied with $\mathbf{v}_a$, produces the same vector (in terms of its own space). Let $M$ have the following form:
+	\begin{equation*}
+		\begin{aligned}
+			M = \sum_{i=1}^{m}\lambda_i \mathbf{a}_i\mathbf{a}_i^\top
+		\end{aligned}
+		\label{eq: M_assumed}
+	\end{equation*}
+	Where $\lambda_i, i=1,\ldots, m$ is the undetermined coefficient, it is derived as follows
+	\begin{equation*}
+		\begin{aligned}
+			M\mathbf{s}=\mathbf{v}_a &\Leftrightarrow M\mathbf{v}_a + M\mathbf{v}_b=\mathbf{v}_a \\
+			&\Leftrightarrow \left(\sum_{i=1}^{m}\lambda_i \mathbf{a}_i \mathbf{a}_i^\top \right)\left(\sum_{i=1}^{m} c_i \mathbf{a}_i + \sum_{j=1}^{p} d_i \mathbf{b}_i \right) = \sum_{i=1}^{m} c_i \mathbf{a}_i \\
+			&\Leftrightarrow \sum_{i=1}^{m} \lambda_i c_i \mathbf{a}_i \mathbf{a}_i^\top \mathbf{a}_i = \sum_{i=1}^{m} c_i \mathbf{a}_i  \quad \text{(orthogonal property)} \\	
+			&\Leftrightarrow \sum_{i=1}^{m} (\lambda_i c_i \mathbf{a}_i^\top \mathbf{a}_i) \mathbf{a}_i = \sum_{i=1}^{m} c_i \mathbf{a}_i \\
+			&\Rightarrow \lambda_i c_i \mathbf{a}_i^\top \mathbf{a}_i = c_i \\
+			&\Rightarrow \lambda_i = \frac{1}{\mathbf{a}_i^\top \mathbf{a}_i}, i=1,\ldots, m.
+		\end{aligned}
+		\label{eq: M_solution}
+	\end{equation*}
+	It is easy to see that, since $\mathbf{a}_j^\top b_k = 0$ for all $j, k$, $A^\top B = 0$. And we know that in terms of $\mathbb{R}^d$ (not in terms of $A$ and $B$), $\mathbf{v}_a$ is just a collection of constants $c$. Thus the results of M are as follows
+	\begin{equation*}
+		\begin{aligned}
+			M = \sum_{i=1}^{m}\frac{\mathbf{a}_i \mathbf{a}_i^\top}{\mathbf{a}_i^\top \mathbf{a}_i} = A^\top
+		\end{aligned}
+	\label{eq: M_result}
+ 	\end{equation*}
+	} 
 			
 			
 	\item[ii.]
 	(4 points) As before, let $v_a$ and $v_b$ be two value vectors corresponding to key vectors $k_a$ and $k_b$, respectively. Assume that (1) all key vectors are orthogonal, so $k_i^\top k_j$ for all $i \neq j$; and (2) all key vectors have norm 1.\footnote{Recall that a vector x has norm 1 if $x^{\top}x = 1$.} \textbf{Find an expression} for a query vector $q$ such that $c \approx \frac{1}{2}(v_a +v_b)$.\footnote{Hint: while the softmax function will never exactly average the two vectors, you can get close by using a large scalar multiple in the expression.}
+	
+	\textcolor{red}{\textbf{Answer:} Assume that $c$ is approximated as follows:
+	\begin{equation*}
+		\begin{aligned}
+			c \approx \frac{1}{2}\mathbf{v}_a + \frac{1}{2}\mathbf{v}_b
+		\end{aligned}
+	\end{equation*}
+	This means we want $\alpha_a \approx 0.5$ and $\alpha_b \approx 0.5$, which can be achieved when (whenever $i \neq a$ and $i \neq b$):
+	\begin{equation*}
+		\begin{aligned}
+			\mathbf{k}_a^\top q \approx \mathbf{k}_b^\top q \gg \mathbf{k}_i^\top \mathbf{q}
+		\end{aligned}
+	\end{equation*}
+	Like explained in the previous question, if the dot product is big, the probability mass will also be big and we want a balanced mass between $\alpha_a$ and $\alpha_b$. $q$ will be largest for $k_a$ and $k_b$ when it is a large multiplicative of a vector that contains a component in $k_a$ direction and in $k_b$ direction:
+	\begin{equation*}
+		\begin{aligned}
+			\mathbf{q} = \beta (\mathbf{k}_a + \mathbf{k}_b), \quad \text{where} \beta \gg 0
+		\end{aligned}
+	\end{equation*}
+	Now, since the keys are orthogonal to each other, it is easy to see that:
+	\begin{equation*}
+		\begin{aligned}
+			\mathbf{k}_a^\top q = \beta; \mathbf{k}_b^\top q = \beta; \mathbf{k}_i^\top q = 0, \quad \text{whever} \ i\neq a \ \text{and} \ i\neq b
+		\end{aligned}
+	\end{equation*}
+	Thus when we exponentiate, only $\exp(\beta)$ will matter, because $\exp(0)$ will be insignificant to the probability mass. We get that:
+	\begin{equation*}
+		\begin{aligned}
+			\alpha_a=\alpha_b=\frac{\exp(\beta)}{n-2+2\exp(\beta)} \approx \frac{\exp(\beta)}{2\exp(\beta)} \approx \frac{1}{2}, \ \text{for} \ \beta \gg 0
+		\end{aligned}
+	\end{equation*}
+	}
+	
 	\end{itemize}	
-		
-		
+	
+	
+	
 	\noindent(c) (5 points) \textbf{Drawbacks of single-headed attention:} In the previous part, we saw how it was \textit{possible} for a single-headed attention to focus equally on two values. The same concept could easily be extended to any subset of values. In this question we’ll see why it’s not a practical solution. Consider a set of key vectors $\{k_1, \ldots , k_n\}$ that are now randomly sampled, $k_i \sim \mathcal{N}(μ_i,\Sigma_i)$, where the means $μ_i \in \mathbb{R}^d$ are known to you, but the covariances $\Sigma_i$ are unknown. Further, assume that the means $μ_i$ are all perpendicular; $\mu^\top_i \mu_j = 0$ if $i \neq j$, and unit norm, $\|\mu_i\| = 1$.
 	
 	\begin{itemize}
@@ -172,7 +245,7 @@
 		% read manual to see what [ht] means and for other possible options
 		\centering 
 		% \includegraphics[width=0.8\columnwidth]{GLADNet}
-		\includegraphics[width=0.5\linewidth]{vector}
+		\includegraphics[width=0.5\linewidth]{ka_plausible}
 		\captionsetup{font=small}
 		\label{vector}
 		\caption{
@@ -188,8 +261,7 @@
 
 	\end{itemize}	
 	
-	\noindent(d) (3 points) \textit{Benefits of multi-headed attention:} Now we’ll see some of the power of multi-headed attention. We’ll consider a simple version of multi-headed attention which is identical to single-headed self-attention as we’ve presented it in this homework, except two query vectors ($q_1$ and $q_2$) are defined, which leads to a pair of vectors ($c_1$ and $c_2$), each the output of single-headed attention given its respective query vector. The final output of the multi-headed attention is their average,$\frac{1}{2}(c_1+c_2)$. As in question 1(c), consider a set of key vectors $\{k_1, \ldots , k_n}$ that are randomly sampled, $k_i \sim \mathcal{N} (\mu_i
-	, \Sigma_i)$, where the means $\mu_i$ are known to you, but the covariances $\Sigma_i$ are unknown. Also as before,	assume that the means µi are mutually orthogonal; $\mu^\top_i \mu_j = 0$ if $i \neq j$, and unit norm,$\|\mu_i\|= 1$.
+	\noindent (d) (3 points) \textit{Benefits of multi-headed attention:} Now we’ll see some of the power of multi-headed attention. We’ll consider a simple version of multi-headed attention which is identical to single-headed self-attention as we’ve presented it in this homework, except two query vectors ($q_1$ and $q_2$) are defined, which leads to a pair of vectors ($c_1$ and $c_2$), each the output of single-headed attention given its respective query vector. The final output of the multi-headed attention is their average,$\frac{1}{2}(c_1+c_2)$. As in question 1(c), consider a set of key vectors $\{k_1, \ldots , k_n\}$ that are randomly sampled, $k_i \sim \mathcal{N} (\mu_i, \Sigma_i)$, where the means $\mu_i$ are known to you, but the covariances $\Sigma_i$ are unknown. Also as before,	assume that the means µi are mutually orthogonal; $\mu^\top_i \mu_j = 0$ if $i \neq j$, and unit norm,$\|\mu_i\|= 1$.
 	
 	\begin{itemize}
 	\item[i.] 
@@ -210,98 +282,7 @@
 	\noindent The code you’re provided with is a fork of Andrej Karpathy’s \textcolor{blue}{minGPT}. It’s nicer than most research code in that it’s relatively simple and transparent. The “GPT” in minGPT refers to the Transformer language model of OpenAI, originally described in \textcolor{blue}{this paper} \cite{b1}.
 	
 	\noindent As in previous assignments, you will want to develop on your machine locally, then run training on HuaWei Could. You’ll need around 5 hours for training, so budget your time accordingly!
-	
-	\begin{figure}[htbp] 
-		% read manual to see what [ht] means and for other possible options
-		\centering 
-		% \includegraphics[width=0.8\columnwidth]{GLADNet}
-		\includegraphics[width=0.5\linewidth]{network}
-		\captionsetup{font=scriptsize}
-		\label{network}
-		\captionsetup{font=scriptsize}
-		\caption{
-			\label{fig: WRNN_network} % spaces are big no-no withing labels
-			% things like fig: are optional in the label but it helps
-			% to orient yourself when you have multiple figures,
-			% equations and tables
-			WRNN网络结构图。
-		}
-	\end{figure}
 
-	
-	\begin{figure}[htbp] 
-		% read manual to see what [ht] means and for other possible options
-		\centering 
-		% \includegraphics[width=0.8\columnwidth]{GLADNet}
-		\begin{subfigure}{0.3\textwidth}
-			\includegraphics[width=\linewidth]{WRNN/parameter_tuning}
-			\captionsetup{font=scriptsize}
-			\caption{parameter\_tuning}
-			\label{fig: WRNN_parameter_tuning}
-		\end{subfigure} 
-		\begin{subfigure}{0.3\textwidth}
-			\includegraphics[width=\linewidth]{WRNN/result_1}
-			\captionsetup{font=scriptsize}
-			\caption{100 25 1e-1}
-			\label{fig: WRNN_result_1}	
-		\end{subfigure} 
-		\begin{subfigure}{0.3\textwidth}
-			\includegraphics[width=\linewidth]{WRNN/result_5}
-			\captionsetup{font=scriptsize}
-			\caption{200 25 1e-1}
-			\label{fig: WRNN_result_5}	
-		\end{subfigure} \\
-		\begin{subfigure}{\textwidth}
-			\includegraphics[width=\linewidth]{WRNN/result_2}
-			\captionsetup{font=scriptsize}
-			\caption{160 30 1e-2}
-			\label{fig: WRNN_result_2}	
-		\end{subfigure} \\ 
-		\begin{subfigure}{\textwidth}
-			\includegraphics[width=\linewidth]{WRNN/result_3}
-			\captionsetup{font=scriptsize}
-			\caption{160 30 1e-3}
-			\label{fig: WRNN_result_3}	
-		\end{subfigure} \\
-		\begin{subfigure}{\textwidth}
-			\includegraphics[width=\linewidth]{WRNN/result_4}
-			\captionsetup{font=scriptsize}
-			\caption{160 30 1e-4}
-			\label{fig: WRNN_result_4}	
-		\end{subfigure}
-		\captionsetup{font=scriptsize}
-		\caption{
-			\label{fig: WRNN_result} % spaces are big no-no withing labels
-			% things like fig: are optional in the label but it helps
-			% to orient yourself when you have multiple figures,
-			% equations and tables
-			WRNN下实现的四组调参结果。因为后期修改了调参策略（在第一题中提到），所以相对比较全面的对比结果还没有（限于作业提交时间关系，后续可以把结果补上，这里图片中的结果只做一个展示和说明。跑一次，找到一个最优的参数需要3h左右）
-		}
-	\end{figure}
-	
-	Fig. \ref{fig: WRNN_result_2}和Fig. \ref{fig: WRNN_result_3}在RNN中有对比实验，loss的值都比RNN的低，或许能够说明在hidden\_layer不是很深的情况下，RNN的效果可能要更好，在不考虑学习率的情况下，从Fig. \ref{fig: WRNN_result_4}和Fig. \ref{fig: WRNN_result_5}的结果中可以推断，随着hidden\_layer的增加，WRNN的效果应该是要优于RNN，但是降低学习率对于RNN和WRNN来说会导致文本出现乱码的情况增多，或者只生成乱码。
-
-	\section{一些说明}
-	
-	完整的项目在已经上传到GitHub\footnote{https://github.com/npukujui11/AI\_2023}中,上面有个人的提交记录和代码的详细修改记录\footnote{https://github.com/npukujui11/AI\_2023/commits/main}。上面提到的图片都是用Jupyter Notebook跑，但是因为题目限定了无法使用第三方RNN库，所以未使用torch，因而无法使用GPU训练模型。而使用CPU训练的速度，加上手动调参，过于缓慢了，所以对比实验没做完全。考虑到，时间的因素，所以完整的训练过程我并没有使用Jupyter Notebook，RNN.py和WRNN.py一直还在在训练（见Fig. \ref{fig: train}）后续完整的结果可以通过邮箱发给老师。
-	
-	\begin{figure}[htbp] 
-		% read manual to see what [ht] means and for other possible options
-		\centering 
-		% \includegraphics[width=0.8\columnwidth]{GLADNet}
-		\includegraphics[width=\linewidth]{train}
-		\captionsetup{font=scriptsize}
-		\label{train}
-		\captionsetup{font=scriptsize}
-		\caption{
-			\label{fig: train} % spaces are big no-no withing labels
-			% things like fig: are optional in the label but it helps
-			% to orient yourself when you have multiple figures,
-			% equations and tables
-			运行RNN.py和WRNN.py的PyCharm界面。
-		}
-	\end{figure}
-	
 	
 	%	\section{Analysis}
 	
