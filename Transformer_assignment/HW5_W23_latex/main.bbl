@@ -1,0 +1,25 @@
+\begin{thebibliography}{1}
+
+\bibitem{hawthorne2022perceiver}
+{\sc Hawthorne, C., Jaegle, A., Cangea, C., Borgeaud, S., Nash, C., Malinowski,
+  M., Dieleman, S., Vinyals, O., Botvinick, M.~M., Simon, I., Sheahan, H.,
+  Zeghidour, N., Alayrac, J., Carreira, J., and Engel, J.~H.}
+\newblock General-purpose, long-context autoregressive modeling with perceiver
+  {AR}.
+\newblock In {\em International Conference on Machine Learning, {ICML} 2022,
+  17-23 July 2022, Baltimore, Maryland, {USA}\/} (2022), vol.~162 of {\em
+  Proceedings of Machine Learning Research}, pp.~8535--8558.
+
+\bibitem{radford2018improving}
+{\sc Radford, A., Narasimhan, K., Salimans, T., and Sutskever, I.}
+\newblock Improving language understanding with unsupervised learning.
+\newblock {\em Technical report, OpenAI\/} (2018).
+
+\bibitem{raffel2020exploring}
+{\sc Raffel, C., Shazeer, N., Roberts, A., Lee, K., Narang, S., Matena, M.,
+  Zhou, Y., Li, W., and Liu, P.~J.}
+\newblock Exploring the limits of transfer learning with a unified text-to-text
+  transformer.
+\newblock {\em Journal of Machine Learning Research 21}, 140 (2020), 1--67.
+
+\end{thebibliography}
