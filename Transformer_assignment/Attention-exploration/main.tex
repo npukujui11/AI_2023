@@ -24,7 +24,14 @@
 \usepackage{bbm}					  % 输入指示函数
 \usepackage{tablefootnote}			  % 表格注释
 \usepackage{pythonhighlight}
-
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead{}
+\fancyfoot{}
+\fancyhead[R]{\small Page \thepage\ of \pageref*{LastPage}}
+\fancyhead[L]{\small Assignment: Self-Attention, Transformers, and Pretraining}
 \usepackage{listings}                 % 导入代码块
 \usepackage{xcolor}
 \lstset{
@@ -47,8 +54,9 @@
 	linkcolor=blue,        % color of internal links
 	citecolor=blue,        % color of links to bibliography
 	filecolor=magenta,     % color of file links
-	urlcolor=blue         
+	urlcolor=blue       
 }
+
 %++++++++++++++++++++++++++++++++++++++++
 \titleformat{\section}{\Large\bfseries\songti}{\thesection}{1em}{}
 \titleformat{\subsection}{\large\bfseries\songti}{\thesubsection}{1em}{}
