@@ -196,6 +196,8 @@
 	\item[ii.]
 	(4 points) As before, let $v_a$ and $v_b$ be two value vectors corresponding to key vectors $k_a$ and $k_b$, respectively. Assume that (1) all key vectors are orthogonal, so $k_i^\top k_j$ for all $i \neq j$; and (2) all key vectors have norm 1.\footnote{Recall that a vector x has norm 1 if $x^{\top}x = 1$.} \textbf{Find an expression} for a query vector $q$ such that $c \approx \frac{1}{2}(v_a +v_b)$.\footnote{Hint: while the softmax function will never exactly average the two vectors, you can get close by using a large scalar multiple in the expression.}
 	
+	\textcolor{blue}{\textbf{Thoughts:} In essence is to find a $q$ makes $\mathbf{k}_a^\top q = \mathbf{k}_b^\top q$, then we know $q^\top (\mathbf{k}_a - \mathbf{k}_b) = 0$, to find a $q$ perpendicular to $\mathbf{k}_a - \mathbf{k}_b$}.
+	
 	\textcolor{red}{\textbf{Answer:} Assume that $c$ is approximated as follows:
 	\begin{equation*}
 		\begin{aligned}
