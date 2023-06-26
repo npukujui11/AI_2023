@@ -90,8 +90,7 @@
 	\section{Attention exploration (22 points)}
 	
 	\noindent Multi-headed self-attention is the core modeling component of Transformers. In this question, we'll get some practice working with the self-attention equations, and motivate why multi-headed self-attention can be preferable to single-headed self-attention.
-	Recall that attention can be viewed as an operation on a \textit{query} $q \in \mathbb{R}^d$, a set of \textit{value} vectors $\{v_1, . . . , v_n \}$, $v_i \in
-	\mathbb{R}^d$, and a set of \textit{key} vectors $\{k_1, . . . , k_n\}$, $k_i \in \mathbb{R}^d$, specified as follows:
+	Recall that attention can be viewed as an operation on a \textit{query} $q \in \mathbb{R}^d$, a set of \textit{value} vectors $\{v_1, . . . , v_n \}$, $v_i \in \mathbb{R}^d$, and a set of \textit{key} vectors $\{k_1, . . . , k_n\}$, $k_i \in \mathbb{R}^d$, specified as follows:
 	
 	\begin{equation}
 		\begin{aligned}
@@ -106,20 +105,18 @@
 		\end{aligned}
 		\label{eq: Attention_formula_2}
 	\end{equation}
-	with $α_i$ termed the “attention weights”. Observe that the output $c \in \mathbb{R}^d$
-	is an average over the value vectors weighted with respect to $α_i$.
-	
+	with $\alpha_i$ termed the "attention weights". Observe that the output $c \in \mathbb{R}^d$ is an average over the value vectors weighted with respect to $\alpha_i$.
 
-	\noindent(a) (4 points) \textbf{Copying in attention.} One advantage of attention is that it's particularly easy to “copy” a value vector to the output c. In this problem, we'll motivate why this is the case.
+	\noindent(a) (4 points) \textbf{Copying in attention.} One advantage of attention is that it's particularly easy to "copy" a value vector to the output $c$. In this problem, we'll motivate why this is the case.
 		
 	\begin{itemize}
 	\item [i.]
 	(1 point) \textbf{Explain} why $\alpha$ can be interpreted as a categorical probability distribution.
 			
-	\textcolor{red}{\textbf{Answer:} Eq.\ref{eq: Attention_formula_1} has shown that this is a fuzzy query, and we cannot directly match a key vector k with the query vector $q$, and can only give each key a certain probability distribution weight (i.e. $\alpha_{ij}$) to get the final output result.}
+	\textcolor{red}{\textbf{Answer:} Eq.\ref{eq: Attention_formula_1} has shown that this is a fuzzy query, and we cannot directly match a key vector $k$ with the query vector $q$, and can only give each key a certain probability distribution weight (i.e. $\alpha_{ij}$) to get the final output result.}
 
 	\item [ii.]
-	(2 points) The distribution $\alpha$ is typically relatively “diffuse”; the probability mass is spread out between many different $\alpha_i$. However, this is not always the case. \textbf{Describe} (in one sentence) under what conditions the categorical distribution $\alpha$ puts almost all of its weight on some $\alpha_j$ , where $j \in \{1, \ldots , n\} (i.e. \quad \alpha_j \gg \sum_{i\neq j} \alpha_i)$. What must be true about the query $q$ and/or the keys $\{k_1, \ldots , k_n\}$?
+	(2 points) The distribution $\alpha$ is typically relatively "diffuse"; the probability mass is spread out between many different $\alpha_i$. However, this is not always the case. \textbf{Describe} (in one sentence) under what conditions the categorical distribution $\alpha$ puts almost all of its weight on some $\alpha_j$ , where $j \in \{1, \ldots , n\} (i.e. \quad \alpha_j \gg \sum_{i\neq j} \alpha_i)$. What must be true about the query $q$ and/or the keys $\{k_1, \ldots , k_n\}$?
 			
 	\textcolor{red}{\textbf{Answer:} According to the calculation method of Eq.\ref{eq: Attention_formula_2}, if the query vector $q$ has a very high similarity to a key $k_i$ (the dot product is large), and $q$ is basically vertical to other bonds (the point product is zero), then $\alpha_i$ will be maximized.}
 
@@ -400,7 +397,7 @@
 	
 	\noindent You'll train a Transformer to perform a task that involves accessing knowledge about the world – knowledge which isn't provided via the task's training data (at least if you want to generalize outside the training set). You'll find that it more or less fails entirely at the task. You'll then learn how to pretrain that Transformer on Wikipedia text that contains world knowledge, and find that finetuning that Transformer on the same knowledge-intensive task enables the model to access some of the knowledge learned at pretraining time. You'll find that this enables models to perform considerably above chance on a held out development set.
 	
-	\noindent The code you're provided with is a fork of Andrej Karpathy's \textcolor{blue}{minGPT\footnote{https://github.com/karpathy/minGPT}}. It's nicer than most research code in that it's relatively simple and transparent. The “GPT” in minGPT refers to the Transformer language model of OpenAI, originally described in \textcolor{blue}{this paper} \cite{b1}.
+	\noindent The code you're provided with is a fork of Andrej Karpathy's \textcolor{blue}{minGPT\footnote{https://github.com/karpathy/minGPT}}. It's nicer than most research code in that it's relatively simple and transparent. The "GPT" in minGPT refers to the Transformer language model of OpenAI, originally described in \textcolor{blue}{this paper} \cite{b1}.
 	
 	\noindent As in previous assignments, you will want to develop on your machine locally, then run training on HuaWei Could. Youll need around 5 hours for training, so budget your time accordingly!
 
@@ -724,7 +721,7 @@
 			\end{itemize}	
 			}
 		\item[(c)] 
-			(2 points) If your model didn't see a person's name at pretraining time, and that person was not seen at fine-tuning time either, it is not possible for it to have “learned” where they lived. Yet, your model will produce something as a predicted birth place for that person's name if asked. Concisely describe a strategy your model might take for predicting a birth place for that person's name, and one reason why this should cause concern for the use of such applications. (You do not need to submit the same answer for 3c as for 3b.)
+			(2 points) If your model didn't see a person's name at pretraining time, and that person was not seen at fine-tuning time either, it is not possible for it to have "learned" where they lived. Yet, your model will produce something as a predicted birth place for that person's name if asked. Concisely describe a strategy your model might take for predicting a birth place for that person's name, and one reason why this should cause concern for the use of such applications. (You do not need to submit the same answer for 3c as for 3b.)
 			
 			\textcolor{red}{\text{Answer:}
 			\begin{itemize}
