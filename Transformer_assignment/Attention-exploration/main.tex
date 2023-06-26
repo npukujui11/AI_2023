@@ -457,6 +457,11 @@
 		
 		This is an intermediate step for later portions, including Part d, which contains commands you can run to check your implementation. No written answer is required for this part.
 		
+		\textcolor{blue}{\textbf{Changes:} Modified line 59 in \texttt{run.py}}
+		\begin{lstlisting}[language=python, basicstyle=\small\ttfamily]
+			model = model.GPT(mconf).to(device)
+		\end{lstlisting}
+		
 	\item[(d)]
 		(5 points)\textbf{Make predictions (without pretraining).}\\ 
 		Train your model on \texttt{birth\_places\_train.tsv}, and evaluate on \texttt{birth\_dev.tsv}. Specifically, you should now be able to run the following three commands:
