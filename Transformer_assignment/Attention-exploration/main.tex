@@ -239,28 +239,96 @@
 	
 	\begin{itemize}
 	\item[i.]
-	(2 points) Assume that the covariance matrices are $\Sigma_i = \alpha I \forall i \in {1, 2, \ldots , n}$, for vanishingly small $\alpha$. Design a query $q$ in terms of the $\mu_i$ such that as before, $c \approx \frac{1}{2}(v_a +v_b)$, and provide a brief argument as to why it works.
+		(2 points) Assume that the covariance matrices are $\Sigma_i = \alpha I \forall i \in {1, 2, \ldots , n}$, for vanishingly small $\alpha$. Design a query $q$ in terms of the $\mu_i$ such that as before, $c \approx \frac{1}{2}(v_a +v_b)$, and provide a brief argument as to why it works.
+		
+		\textcolor{red}{\textbf{Answer:} Because the covariance matrix is small, $k_i$ can be approximately replaced by $\mu_i$:
+		\begin{equation*}
+			\begin{aligned}
+				k_i \approx \mu_i
+			\end{aligned}
+		\end{equation*}
+		Since the key vectors $k_a$ and $k_b$ are orthogonal to each other, the problem can be reduced to the previous case where all keys were orthogonal. Therefore, the expression for the query vector $q$ remains the same as in the previous case: 
+		\begin{equation*}
+			\begin{aligned}
+				\mathbf{q}=\beta(\mu_a+\mu_b), \quad \text{where} \ \beta \gg 0
+			\end{aligned}
+		\end{equation*}
+		}
 		
 	\item[ii.]
-	(3 points) Though single-headed attention is resistant to small perturbations in the keys, some types of larger perturbations may pose a bigger issue. Specifically, in some cases, one key vector $k_a$ may be larger or smaller in norm than the others, while still pointing in the same direction as $\mu_a$. As an example, let us consider a covariance for item $a$ as $\Sigma_a = \alpha I+ \frac{1}{2}(\mu_a\mu^\top_a )$ for vanishingly small $\alpha$ (as shown in Fig. \ref{fig: vector}). This causes $k_a$ to point in roughly the same direction as $\mu_a$, but with large variances in magnitude. Further, let $\Sigma_i = \alpha I$ for all $i \neq a$.
+		(3 points) Though single-headed attention is resistant to small perturbations in the keys, some types of larger perturbations may pose a bigger issue. Specifically, in some cases, one key vector $k_a$ may be larger or smaller in norm than the others, while still pointing in the same direction as $\mu_a$. As an example, let us consider a covariance for item $a$ as $\Sigma_a = \alpha I+ \frac{1}{2}(\mu_a\mu^\top_a )$ for vanishingly small $\alpha$ (as shown in Fig. \ref{fig: vector}). This causes $k_a$ to point in roughly the same direction as $\mu_a$, but with large variances in magnitude. Further, let $\Sigma_i = \alpha I$ for all $i \neq a$.
 		
-	\begin{figure}[htbp] 
-		% read manual to see what [ht] means and for other possible options
-		\centering 
-		% \includegraphics[width=0.8\columnwidth]{GLADNet}
-		\includegraphics[width=0.5\linewidth]{ka_plausible}
-		\captionsetup{font=small}
-		\label{vector}
-		\caption{
-			\label{fig: vector} % spaces are big no-no withing labels
-			% things like fig: are optional in the label but it helps
-			% to orient yourself when you have multiple figures,
-			% equations and tables
-			The vector $\mu_a$ (shown here in 2D as an example), with the range of possible values of $k_a$ shown in red. As mentioned previously, $k_a$ points in roughly the same direction as $\mu_a$, but may have larger or smaller magnitude.
+		\begin{figure}[htbp] 
+			% read manual to see what [ht] means and for other possible options
+			\centering 
+			% \includegraphics[width=0.8\columnwidth]{GLADNet}
+			\includegraphics[width=0.5\linewidth]{ka_plausible}
+			\captionsetup{font=small}
+			\label{vector}
+			\caption{
+				\label{fig: vector} % spaces are big no-no withing labels
+				% things like fig: are optional in the label but it helps
+				% to orient yourself when you have multiple figures,
+				% equations and tables
+				The vector $\mu_a$ (shown here in 2D as an example), with the range of possible values of $k_a$ shown in red. As mentioned previously, $k_a$ points in roughly the same direction as $\mu_a$, but may have larger or smaller magnitude.
+			}
+		\end{figure}
+		
+		When you sample $\{k_1, \ldots , k_n\}$ multiple times, and use the $q$ vector that you defined in part i., what qualitatively do you expect the vector $c$ will look like for different samples?
+		
+		\textcolor{blue}{\textbf{Thoughts:} It is easy to think that if there is an obviously large bond vector $k_a$, then the weight obtained by the single-head attention mechanism is meaningless, because the weighted sum is basically directed in the direction of $k_a$.}
+		
+		\textcolor{red}{\textbf{Answer:} Since $\mu_i^\top\mu_i = 1$, $\mathbf{k}_a$ varies between $(\alpha + 0.5)\mu_a$ and $(\alpha + 1.5)\mu_a$. All other $\mathbf{k}_i$, whenever $i \neq a$, almost don't vary at all. Noting that $\alpha$ is vanishingly small:
+		\begin{equation*}
+			\begin{aligned}
+				\mathbf{k}_a \approx \gamma \mu_a, \quad \text{where} \ \gamma \sim \mathcal{N}(1,0.5)
+			\end{aligned}
+		\end{equation*}
+		\begin{equation*}
+			\begin{aligned}
+				\mathbf{k}_i \approx \mu_i, \quad \text{whenever} \ i \neq a
+			\end{aligned}
+		\end{equation*}
+		Since $\mathbf{q}$ is most similar in directions $\mathbf{k}_a$ and $\mathbf{k}_b$, we can assume that the dot product between $\mathbf{q}$ and any other key vector is 0 (since all key vectors are orthogonal). Thus there are 2 cases to consider (note that means are normalized and orthogonal to each other):
+		\begin{equation*}
+			\begin{aligned}
+				\mathbf{k}_a^\top \mathbf{q} \approx \gamma \mu_a^\top \beta \left( \mu_a + \mu_b \right) \approx \gamma \beta, \quad \text{where} \ \beta \gg 0
+			\end{aligned}
+		\end{equation*}
+		\begin{equation*}
+			\begin{aligned}
+				\mathbf{k}_b^\top \mathbf{q} \approx \mu_b^\top \beta \left( \mu_a + \mu_b \right) \approx \beta, \quad \text{where} \ \beta \gg 0
+			\end{aligned}
+		\end{equation*}
+		We can now directly solve for coefficients $\alpha_a$ and $\alpha_b$, remembering that for large $\beta$ values $\exp(0)$ are insignificant (note how $\frac{\exp(a)}{\exp(a)+\exp(b)} = \frac{\exp(a)}{\exp(a)+\exp(b)}\frac{\exp(-a)}{\exp(-a)}=\frac{1}{1+\exp(b-a)}$):
+		\begin{equation*}
+			\begin{aligned}
+				\alpha_a \approx \frac{\exp(\gamma \beta)}{\exp(\gamma \beta) + \exp(\beta)} \approx \frac{1}{1+\exp(\beta(1-\gamma))}
+			\end{aligned}
+		\end{equation*}
+		\begin{equation*}
+			\begin{aligned}
+				\alpha_b \approx \frac{\exp(\beta)}{\exp(\beta) + \exp(\gamma  \beta)} \approx \frac{1}{1+\exp(\beta(\gamma-1))}
+			\end{aligned}
+		\end{equation*}
+		Since $\gamma$ varies between 0.5 and 1.5, and since $\gamma \gg 0$, we have that:
+		\begin{equation*}
+			\begin{aligned}
+				\alpha_a \approx \frac{1}{1 + \infty} \approx 0; \quad \alpha_b \approx \frac{1}{1+0} \approx 1; \quad \text{when} \ \gamma = 0.5
+			\end{aligned}
+		\end{equation*}
+		\begin{equation*}
+			\begin{aligned}
+				\alpha_a \approx \frac{1}{1 + 0} \approx 1; \quad \alpha_b \approx \frac{1}{1+\infty} \approx 0; \quad \text{when} \ \gamma = 1.5
+			\end{aligned}
+		\end{equation*}
+		Since $c \approx \alpha_a \mathbf{v}_a + \alpha_b \mathbf{v}_b$ because other terms are insignificant when $\beta$ is large, we can see that $\mathbf{c}$ oscillates between $\mathbf{v}_a$ and $\mathbf{v}_b$:
+		\begin{equation*}
+			\begin{aligned}
+				\mathbf{c} \approx \mathbf{v}_b, \quad \text{when} \ \gamma \rightarrow 0.5; \quad \mathbf{c} \approx \mathbf{v}_b, \ \text{when} \ \gamma \rightarrow 1.5 
+			\end{aligned}
+		\end{equation*}
 		}
-	\end{figure}
-		
-	When you sample $\{k_1, \ldots , k_n\}$ multiple times, and use the $q$ vector that you defined in part i., what qualitatively do you expect the vector $c$ will look like for different samples?
 
 	\end{itemize}	
 	
@@ -268,14 +336,14 @@
 	
 	\begin{itemize}
 	\item[i.] 
-	(1 point) Assume that the covariance matrices are $\Sigma_i = \alpha I$, for vanishingly small $\alpha$. Design $q_1$
-	and $q_2$ such that $c$ is approximately equal to $\frac{1}{2}(v_a + v_b)$.
+		(1 point) Assume that the covariance matrices are $\Sigma_i = \alpha I$, for vanishingly small $\alpha$. Design $q_1$
+		and $q_2$ such that $c$ is approximately equal to $\frac{1}{2}(v_a + v_b)$.
 	
 	\item[ii.] 
-	(2 points) Assume that the covariance matrices are $\Sigma_a = \alpha I + \frac{1}{2}(\mu_a \mu_a^\top)$ for vanishingly small $\alpha$, and $\Sigma_i = \alpha I$ for all $i \neq a$. Take the query vectors $q_1$ and $q_2$ that you designed in part i.
-	
-	What, qualitatively, do you expect the output $c$ to look like across different samples of the key
-	vectors? Please briefly explain why. You can ignore cases in which $k^\top_a q_i < 0$.
+		(2 points) Assume that the covariance matrices are $\Sigma_a = \alpha I + \frac{1}{2}(\mu_a \mu_a^\top)$ for vanishingly small $\alpha$, and $\Sigma_i = \alpha I$ for all $i \neq a$. Take the query vectors $q_1$ and $q_2$ that you designed in part i.
+		
+		What, qualitatively, do you expect the output $c$ to look like across different samples of the key
+		vectors? Please briefly explain why. You can ignore cases in which $k^\top_a q_i < 0$.
 	\end{itemize}	
 	
 	\section{Pretrained Transformer models and knowledge access (35 points)}
