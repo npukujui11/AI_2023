@@ -5,7 +5,6 @@ from tqdm import tqdm
 from torch.nn import functional as F
 import random
 import argparse
-import multiprocessing
 random.seed(0)
 
 import dataset
@@ -43,9 +42,7 @@ device = torch.cuda.current_device() if torch.cuda.is_available() else 'cpu'
 # (that is, the same mapping from character to integer, and we build the 
 # vocab from the pretraining corpus.)
 block_size = 128
-# text = open(args.pretrain_corpus_path).read()
-with open(args.pretrain_corpus_path, 'r', encoding='utf-8') as file:
-    text = file.read()
+text = open(args.pretrain_corpus_path, encoding="utf-8").read()
 pretrain_dataset = dataset.CharCorruptionDataset(text, block_size)
 
 # We don't suggest you change these hyperparameters, as they're known to work.
@@ -56,20 +53,20 @@ mconf = model.GPTConfig(pretrain_dataset.vocab_size, pretrain_dataset.block_size
 """
 Don't change above here; write your code below
 """
+
+if args.variant == 'vanilla':
+    # TODO [part c]: Make some model here
+    model = model.GPT(mconf).to(device)
+elif args.variant == 'synthesizer':
+    # TODO [part g]: Make some other model here
+    mconf.synthesizer = True
+    model = model.GPT(mconf)
+    model.to(device)
+
+# From here on, your code should be identical independent of which
+# variant (vanilla or synthesizer) has been chosen.
+
 if __name__ == '__main__':
-    multiprocessing.freeze_support()
-
-    if args.variant == 'vanilla':
-        # TODO [part c]: Make some model here
-        model = model.GPT(mconf).to(device)
-    elif args.variant == 'synthesizer':
-        # TODO [part g]: Make some other model here
-        mconf.synthesizer = True
-        model = model.GPT(mconf).to(device)
-
-    # From here on, your code should be identical independent of which
-    # variant (vanilla or synthesizer) has been chosen.
-
     if args.function == 'pretrain':
         assert args.pretrain_corpus_path is not None
         assert args.writing_params_path is not None
@@ -88,23 +85,12 @@ if __name__ == '__main__':
         #     warmup_tokens=512*20
         #     final_tokens=200*len(pretrain_dataset)*block_size
         #     num_workers=4
-
-        # Specify hyperparams
-        hyperparameters = {
-            "max_epochs": 650,
-            "batch_size": 128,
-            "learning_rate": 6e-3,
-            "lr_decay": True,
-            "warmup_tokens": 512*20,
-            "final_tokens": 200*len(pretrain_dataset)*block_size,
-            "num_workers": 4
-        }
-
-        # Initialize training configuration & run train
-        tconf = trainer.TrainerConfig(**hyperparameters)
-        trainer.Trainer(model, pretrain_dataset, None, tconf).train()
-
-        # Save the pretrained model parameters to specified path
+        train_config = trainer.TrainerConfig(max_epochs=650, batch_size=128, learning_rate=6e-3, lr_decay=True,
+                                             warmup_tokens=512 * 20,
+                                             final_tokens=200 * len(pretrain_dataset) * block_size,
+                                             num_workers=0)
+        trainerGPT = trainer.Trainer(model, pretrain_dataset, None, train_config)
+        trainerGPT.train()
         torch.save(model.state_dict(), args.writing_params_path)
 
     elif args.function == 'finetune':
@@ -138,46 +124,22 @@ if __name__ == '__main__':
         #         warmup_tokens=512*20
         #         final_tokens=200*len(pretrain_dataset)*block_size
         #         num_workers=4
-        if args.reading_params_path is not None:
+        if args.reading_params_path is not None:  # finetuning with pretrain
             model.load_state_dict(torch.load(args.reading_params_path))
-            hyperparameters = {
-                "max_epochs": 10,
-                "batch_size": 256,
-                "learning_rate": 6e-4,
-                "lr_decay": True,
-                "warmup_tokens": 512 * 20,
-                "final_tokens": 200 * len(pretrain_dataset) * block_size,
-                "num_workers": 4
-            }
-        else:
-            hyperparameters = {
-                "max_epochs": 75,
-                "batch_size": 256,
-                "learning_rate": 6e-4,
-                "lr_decay": True,
-                "warmup_tokens": 512 * 20,
-                "final_tokens": 200 * len(pretrain_dataset) * block_size,
-                "num_workers": 4
-            }
-
-        # Initialize the name dataset from corpus for finetuning
-        finetune_corpus = open(args.finetune_corpus_path).read()
-        finetune_dataset = dataset.NameDataset(pretrain_dataset, finetune_corpus)
-
-        if args.eval_corpus_path is not None:
-            # Init the name dataset from corpus for evaluation
-            eval_corpus = open(args.eval_corpus_path).read()
-            eval_dataset = dataset.NameDataset(pretrain_dataset, eval_corpus)
-        else:
-            # If not provided
-            eval_dataset = None
-
-        # Initialize training configuration & run train
-        tconf = trainer.TrainerConfig(**hyperparameters)
-        trainer.Trainer(model, finetune_dataset, eval_dataset, tconf).train()
-
-        # Save the finetuned model parameters to specified path
+            train_config = trainer.TrainerConfig(max_epochs=10, batch_size=256, learning_rate=6e-4, lr_decay=True,
+                                                 warmup_tokens=512 * 20,
+                                                 final_tokens=200 * len(pretrain_dataset) * block_size,
+                                                 num_workers=0)
+        else:  # finetuning without pretrain
+            train_config = trainer.TrainerConfig(max_epochs=75, batch_size=256, learning_rate=6e-4, lr_decay=True,
+                                                 warmup_tokens=512 * 20,
+                                                 final_tokens=200 * len(pretrain_dataset) * block_size,
+                                                 num_workers=0)
+        train_dataset = dataset.NameDataset(pretrain_dataset, open(args.finetune_corpus_path, encoding="utf-8").read())
+        trainerGPT = trainer.Trainer(model, train_dataset, None, train_config)
+        trainerGPT.train()
         torch.save(model.state_dict(), args.writing_params_path)
+
     elif args.function == 'evaluate':
         assert args.outputs_path is not None
         assert args.reading_params_path is not None
@@ -187,7 +149,7 @@ if __name__ == '__main__':
         total = 0
         with open(args.outputs_path, 'w') as fout:
             predictions = []
-            for line in tqdm(open(args.eval_corpus_path)):
+            for line in tqdm(open(args.eval_corpus_path, encoding="utf-8")):
                 x = line.split('\t')[0]
                 x = x + '⁇'
                 x = torch.tensor([pretrain_dataset.stoi[s] for s in x], dtype=torch.long)[None,...].to(device)
@@ -202,4 +164,3 @@ if __name__ == '__main__':
         else:
             print('Predictions written to {}; no targets provided'
                     .format(args.outputs_path))
-
