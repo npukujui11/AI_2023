@@ -430,6 +430,23 @@
 			python src/dataset.py namedata 
 		\end{lstlisting}
 		Note that you do not have to write any code or submit written answers for this part.
+		
+		\textcolor{red}{\text{Answer:}Running the python \texttt{src/dataset.py namedata} gives the following output(Fig. \ref{fig: 2.b.result}).
+		\begin{figure}[htbp] 
+			% read manual to see what [ht] means and for other possible options
+			\centering 
+			% \includegraphics[width=0.8\columnwidth]{GLADNet}
+			\includegraphics[width=0.9\linewidth]{2.b.result}
+			\captionsetup{font=small}
+			\caption{
+				\label{fig: 2.b.result} % spaces are big no-no withing labels
+				% things like fig: are optional in the label but it helps
+				% to orient yourself when you have multiple figures,
+				% equations and tables
+				The output obtained from running python \texttt{src/dataset.py namedata}
+			}
+		\end{figure}
+		}
 	
 	\item[(c)]
 		(0 points)\textbf{Implement finetuning (without pretraining).}\\
@@ -467,6 +484,35 @@
 		
 		Training will take less than 10 minutes (on Huawei Cloud).  Report your model's accuracy on the dev set (as printed by the second command above). Don't be surprised if it is well below 10\%; we will be digging into why in Part 3. As a reference point, we want to also calculate the accuracy the model would have achieved if it had just predicted ``London'' as the birth place for everyone in the dev set. Fill in \texttt{london\_baseline.py} to calculate the accuracy of that approach and report your result in your write-up. You should be able to leverage existing code such that the file is only a few lines long. 
 		
+		\textcolor{red}{\text{Answer:} See Fig.\ref{fig: 2.d.result} for the running process.
+		\begin{itemize}
+			\item [$ \bullet $] Model's accuracy: Correct: 5.0 out of 500.0: 1.0\%
+			\item [$ \bullet $] If only "London": Correct: 25.0 out of 500.0: 5.0\%
+		\end{itemize}
+		\begin{figure}[htbp] 
+			% read manual to see what [ht] means and for other possible options
+			\centering 
+			% \includegraphics[width=0.8\columnwidth]{GLADNet}
+			\begin{subfigure}{\textwidth}
+				\includegraphics[width=\linewidth]{picture/2.d.result.1}
+				\captionsetup{font=scriptsize}
+				\caption{result 1}
+				\label{fig: 2.d.result.1}
+			\end{subfigure} \\
+			\begin{subfigure}{\textwidth}
+				\includegraphics[width=\linewidth]{picture/2.d.result.2}
+				\captionsetup{font=scriptsize}
+				\caption{result 2}
+				\label{fig: 2.d.result.2}
+			\end{subfigure}
+			\captionsetup{font=scriptsize}
+			\caption{
+				\label{fig: 2.d.result} 
+				The output obtained from running the script
+			}
+		\end{figure}
+		}
+		
 	\item[(e)]
 		(10 points)\textbf{Define a \textit{span corruption} function for pretraining.}\\
 		In the file \texttt{src/dataset.py}, implement the \texttt{\_\_getitem\_\_()} function for the dataset class \\ \texttt{CharCorruptionDataset}.
@@ -485,6 +531,24 @@
 		\end{lstlisting}
 		
 		No written answer is required for this part.
+		
+		\textcolor{red}{\text{Answer:}Running the python \texttt{src/dataset.py charcorruption} gives the following output(Fig. \ref{fig: 2.e.result}).
+			\begin{figure}[htbp] 
+				% read manual to see what [ht] means and for other possible options
+				\centering 
+				% \includegraphics[width=0.8\columnwidth]{GLADNet}
+				\includegraphics[width=0.9\linewidth]{picture/2.e.result}
+				\captionsetup{font=small}
+				\caption{
+					\label{fig: 2.e.result} % spaces are big no-no withing labels
+					% things like fig: are optional in the label but it helps
+					% to orient yourself when you have multiple figures,
+					% equations and tables
+					The output obtained from running python \texttt{src/dataset.py charcorruption}
+				}
+			\end{figure}
+		}
+		
 		
 	\item[(f)]
 		(10 points)\textbf{Pretrain, finetune, and make predictions. Budget 2 hours for training.}\\
@@ -516,6 +580,40 @@
 		\end{lstlisting}
 		
 		Report the accuracy on the dev set (printed by the third command above). We expect the dev accuracy will be at least 10\%, and will expect a similar accuracy on the held out test set.
+		
+		\textcolor{red}{\text{Answer:}Run procedure and results are shown in Fig. \ref{fig: 2.f.process.1}, \ref{fig: 2.f.result.1}.
+		\begin{itemize}
+			\item [$ \bullet $] dev accuracy: Correct: 85.0 out of 500.0: 17.0\%
+		\end{itemize}
+		\begin{figure}[htbp] 
+			% read manual to see what [ht] means and for other possible options
+			\centering 
+			\includegraphics[width=0.9\linewidth]{picture/2.f.process.1}
+			\captionsetup{font=small}
+			\captionsetup{font=scriptsize}
+			\caption{
+				\label{fig: 2.f.process.1} % spaces are big no-no withing labels
+				% things like fig: are optional in the label but it helps
+				% to orient yourself when you have multiple figures,
+				% equations and tables
+				The output obtained from running python \texttt{src/run.py pretrain vanilla wiki.txt --writing\_params\_path vanilla.pretrain.params}
+			}
+		\end{figure}
+		\begin{figure}[htbp] 
+			% read manual to see what [ht] means and for other possible options
+			\centering 
+			\includegraphics[width=0.7\linewidth]{picture/2.f.result.1}
+			\captionsetup{font=small}
+			\captionsetup{font=scriptsize}
+			\caption{
+				\label{fig: 2.f.result.1} % spaces are big no-no withing labels
+				% things like fig: are optional in the label but it helps
+				% to orient yourself when you have multiple figures,
+				% equations and tables
+				The output obtained from running python \texttt{src/run.py evaluate vanilla wiki.txt --reading\_params\_path vanilla.finetune.params --eval\_corpus\_path birth\_dev.tsv --outputs\_path vanilla.pretrain.dev.predictions}
+			}
+		\end{figure}
+		}
 		
 	\item[(g)]
 		(10 points)\textbf{Research! Write and try out a more efficient variant of Attention (Budget 2 hours for pretraining!)}\\
@@ -580,8 +678,30 @@
 		\item[i.]
 			(8 points)We'll score your model as to whether it gets at least 5\% accuracy on the test set, which has answers held out.
 			
+			\textcolor{red}{\text{Answer:} dev accuracy: Correct: 87.0 out of 500.0: 17.4\%
+			\begin{figure}[htbp] 
+				% read manual to see what [ht] means and for other possible options
+				\centering 
+				\includegraphics[width=\linewidth]{picture/2.g.result}
+				\captionsetup{font=small}
+				%\captionsetup{font=scriptsize}
+				\caption{
+					\label{fig: 2.g.result} % spaces are big no-no withing labels
+					% things like fig: are optional in the label but it helps
+					% to orient yourself when you have multiple figures,
+					% equations and tables
+					The output obtained from running python \texttt{src/run.py evaluate synthesizer wiki.txt --reading\_params\_path synthesizer.finetune.params --eval\_corpus\_path birth\_dev.tsv --outputs\_path synthesizer.pretrain.dev.predictions
+					}
+				}
+			\end{figure}
+			}
+			
+			
 		\item[ii.]
 			(2 points)Why might the synthesizer self-attention not be able to do, in a single layer, what the key-query-value self-attention can do?
+			
+			\textcolor{red}{\text{Answer:} Synthesizer attention is unable to do what the causal attention can do because it does not extract keys and queries from the input - it estimates that by remapping input to a lower dimensional space for each head. In other words, it is more difficult to represent context because for every word in sequence, that word is unable to choose which parts to pay attention to in the rest of the sequence (because it does not have access to their keys). Thus the synthesizer may not be able to capture the relevance between word pairs.}
+			
 		\end{itemize}
 		
 	\end{itemize}
@@ -592,80 +712,31 @@
 	\begin{itemize}
 		\item[(a)]
 			(1 point) Succinctly explain why the pretrained (vanilla) model was able to achieve an accuracy of above 10\%, whereas the non-pretrained model was not.
+			
+			\textcolor{red}{\text{Answer:} The pretrained (vanilla) model was able to achieve an accuracy above 10\% because it had been pretrained on a large corpus of text data, which helped it learn general language patterns and information. During pretraining, the model learned to predict the next word in a sentence based on the context it was given. This process allowed the model to develop a basic understanding of grammar, vocabulary, and semantic relationships. As a result, when fine-tuned on the specific task of predicting birthplaces, the pretrained model had some prior knowledge and linguistic abilities that helped it perform better than the non-pretrained model, which started from scratch.}
 		\item[(b)]
 			(2 points) Take a look at some of the correct predictions of the pretrain+finetuned vanilla model, as well as some of the errors. We think you'll find that it's impossible to tell, just looking at the output, whether the model retrieved the correct birth place, or made up an incorrect birth place. Consider the implications of this for user-facing systems that involve pretrained NLP components. Come up with two \textbf{distinct} reasons why this model behavior (i.e. unable to tell whether it's retrieved or made up) may cause concern for such applications, and an example for each reason.
+			
+			\textcolor{red}{\text{Answer:} 
+			\begin{itemize}
+				\item [$\bullet$] One reason why the inability to determine whether the model retrieved the correct birthplace or made up an incorrect one is concerning for user-facing systems is the potential for spreading misinformation. If the model generates incorrect birthplace predictions and presents them as factual information to users, it can lead to the dissemination of false or misleading data. For example, if the model inaccurately predicts a celebrity's birthplace, users relying on the system may unknowingly spread false information through social media or other platforms.
+				\item [$\bullet$] Another concern is the erosion of trust in the system and its outputs. If users cannot discern whether the predicted birthplaces are reliable or fabricated, it undermines the credibility and usability of the system. Users may become skeptical or hesitant to rely on the system's predictions, especially if they have encountered instances where the predictions were incorrect. This lack of transparency and confidence in the model's outputs can significantly impact the user experience and limit the adoption of such applications.
+			\end{itemize}	
+			}
 		\item[(c)] 
 			(2 points) If your model didn't see a person's name at pretraining time, and that person was not seen at fine-tuning time either, it is not possible for it to have “learned” where they lived. Yet, your model will produce something as a predicted birth place for that person's name if asked. Concisely describe a strategy your model might take for predicting a birth place for that person's name, and one reason why this should cause concern for the use of such applications. (You do not need to submit the same answer for 3c as for 3b.)
+			
+			\textcolor{red}{\text{Answer:}
+			\begin{itemize}
+				\item [$\bullet$]
+				In the absence of pretraining or fine-tuning data for a specific person's name, the model may employ a strategy of generating a birthplace based on statistical patterns observed in the training data. For example, the model might identify common patterns between names and birthplaces, such as geographical associations or cultural trends. It could use this information to make an educated guess about the person's birthplace.
+				However, this strategy should raise concerns in the context of user-facing applications. One reason is the potential for perpetuating stereotypes or biases. If the model relies on statistical patterns that reflect existing societal biases, it may produce birthplace predictions that align with those biases, reinforcing stereotypes or prejudices. This can have negative implications, such as perpetuating discriminatory views or reinforcing unfair generalizations based on demographics.
+				\item [$\bullet$]
+				Additionally, generating birthplace predictions for individuals without proper data or evidence can lead to the spread of speculative or misleading information. Users may interpret the model's predictions as factual, even if they are based on assumptions or statistical correlations. This can contribute to the proliferation of inaccurate or unverified information, further complicating the task of distinguishing between reliable and unreliable sources of information in user-facing systems.
+			\end{itemize}
+			}
 	\end{itemize}
-	
-	%	\section{Analysis}
-	
-	%	In this section you will need to show your experimental results. Use tables and
-	%	graphs when it is possible. Table~\ref{tbl:bins} is an example.
-	
-	%	\begin{table}[ht]
-		%		\begin{center}
-			%			\caption{Every table needs a caption.}
-			%			\label{tbl:bins} % spaces are big no-no withing labels
-			%			\begin{tabular}{|ccc|} 
-				%				\hline
-				%				\multicolumn{1}{|c}{$x$ (m)} & \multicolumn{1}{c|}{$V$ (V)} & \multicolumn{1}{c|}{$V$ (V)} \\
-				%				\hline
-				%				0.0044151 &   0.0030871 &   0.0030871\\
-				%				0.0021633 &   0.0021343 &   0.0030871\\
-				%				0.0003600 &   0.0018642 &   0.0030871\\
-				%				0.0023831 &   0.0013287 &   0.0030871\\
-				%				\hline
-				%			\end{tabular}
-			%		\end{center}
-		%	\end{table}
-	%	
-	%	Analysis of equation~\ref{eq:aperp} shows ...
-	%	
-	%	Note: this section can be integrated with the previous one as long as you
-	%	address the issue. Here explain how you determine uncertainties for different
-	%	measured values. Suppose that in the experiment you make a series of
-	%	measurements of a resistance of the wire $R$ for different applied voltages
-	%	$V$, then you calculate the temperature from the resistance using a known
-	%	equation and make a plot  temperature vs. voltage squared. Again suppose that
-	%	this dependence is expected to be linear~\cite{Cyr}, and the proportionality coefficient
-	%	is extracted from the graph. Then what you need to explain is that for the
-	%	resistance and the voltage the uncertainties are instrumental (since each
-	%	measurements in done only once), and they are $\dots$. Then give an equation
-	%	for calculating the uncertainty of the temperature from the resistance
-	%	uncertainty. Finally explain how the uncertainty of the slop of the graph was
-	%	found (computer fitting, graphical method, \emph{etc}.)
-	%	
-	%	If in the process of data analysis you found any noticeable systematic
-	%	error(s), you have to explain them in this section of the report.
-	%	
-	%	It is also recommended to plot the data graphically to efficiently illustrate
-	%	any points of discussion. For example, it is easy to conclude that the
-	%	experiment and theory match each other rather well if you look at
-	%	Fig.~\ref{fig:samplesetup} and Fig.~\ref{fig:exp_plots}.
-	%	
-	%	\begin{figure}[ht] 
-		%		\centering
-		%		\includegraphics[width=0.5\columnwidth]{sr_squeezing_vs_detuning}
-		%		
-		%		% some figures do not need to be too wide
-		%		\caption{
-			%			\label{fig:exp_plots}  
-			%			Every plot must have axes labeled.
-			%		}
-		%	\end{figure}
-	
-	
-	%	\section{Conclusions}
-	%	Here you briefly summarize your findings.
-	
-	%++++++++++++++++++++++++++++++++++++++++
-	% References section will be created automatically 
-	% with inclusion of "thebibliography" environment
-	% as it shown below. See text starting with line
-	% \begin{thebibliography}{99}
-		% Note: with this approach it is YOUR responsibility to put them in order
-		% of appearance.
+
 		
 \renewcommand{\refname}{References}
 		
