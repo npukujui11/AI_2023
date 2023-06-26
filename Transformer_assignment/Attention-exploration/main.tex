@@ -457,10 +457,32 @@
 		
 		This is an intermediate step for later portions, including Part d, which contains commands you can run to check your implementation. No written answer is required for this part.
 		
-		\textcolor{blue}{\textbf{Changes:} Modified line 59 in \texttt{run.py}}
+		\textcolor{blue}{\textbf{Changes:} Modified line 59 and 127-141 in \texttt{run.py}} 
 		\begin{lstlisting}[language=python, basicstyle=\small\ttfamily]
+			# line 59
 			model = model.GPT(mconf).to(device)
+			
+			# line 127-141
+			if args.reading_params_path is not None:  # finetuning with pretrain
+					model.load_state_dict(torch.load(args.reading_params_path))
+					train_config = trainer.TrainerConfig(max_epochs=10, batch_size=256, \
+						learning_rate=6e-4, lr_decay=True, \
+						warmup_tokens=512 * 20, \
+						final_tokens=200 * len(pretrain_dataset) * block_size, \
+						num_workers=0)
+			else:  # finetuning without pretrain
+					train_config = trainer.TrainerConfig(max_epochs=75, batch_size=256, \
+						learning_rate=6e-4, lr_decay=True, \
+						warmup_tokens=512 * 20, \
+						final_tokens=200 * len(pretrain_dataset) * block_size, \
+						num_workers=0)
+			train_dataset = dataset.NameDataset(pretrain_dataset, open(args.finetune_corpus_path, encoding="utf-8").read())
+			trainerGPT = trainer.Trainer(model, train_dataset, None, train_config)
+			trainerGPT.train()
+			torch.save(model.state_dict(), args.writing_params_path)
 		\end{lstlisting}
+		
+		
 		
 	\item[(d)]
 		(5 points)\textbf{Make predictions (without pretraining).}\\ 
@@ -652,6 +674,20 @@
 		\end{figure}
 		}
 		
+		\textcolor{blue}{\textbf{Changes:} Modified line 88-94 in \texttt{run.py}} 
+		\begin{lstlisting}[language=python, basicstyle=\small\ttfamily]
+			# line 88-94
+			train_config = trainer.TrainerConfig(max_epochs=650, batch_size=128, \ 
+					learning_rate=6e-3, lr_decay=True, \
+					warmup_tokens=512 * 20, \
+					final_tokens=200 * len(pretrain_dataset) * block_size, \
+					num_workers=0)
+			trainerGPT = trainer.Trainer(model, pretrain_dataset, None, train_config)
+			trainerGPT.train()
+			torch.save(model.state_dict(), args.writing_params_path)
+		\end{lstlisting}
+		
+		
 	\item[(g)]
 		(10 points)\textbf{Research! Write and try out a more efficient variant of Attention (Budget 2 hours for pretraining!)}\\
 		
@@ -715,7 +751,7 @@
 		\item[i.]
 			(8 points)We'll score your model as to whether it gets at least 5\% accuracy on the test set, which has answers held out.
 			
-			\textcolor{red}{\text{Answer:} dev accuracy: Correct: 87.0 out of 500.0: 17.4\%
+			\textcolor{red}{\textbf{Answer:} dev accuracy: Correct: 87.0 out of 500.0: 17.4\%
 			\begin{figure}[htbp] 
 				% read manual to see what [ht] means and for other possible options
 				\centering 
@@ -733,6 +769,12 @@
 			\end{figure}
 			}
 			
+			\textcolor{blue}{\textbf{Changes:} Modified line 62-64 in \texttt{run.py}}
+			\begin{lstlisting}[language=python, basicstyle=\small\ttfamily]
+				mconf.synthesizer = True
+				model = model.GPT(mconf)
+				model.to(device)
+			\end{lstlisting}
 			
 		\item[ii.]
 			(2 points)Why might the synthesizer self-attention not be able to do, in a single layer, what the key-query-value self-attention can do?
