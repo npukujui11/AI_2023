@@ -529,7 +529,7 @@
 		
 		No written answer is required for this part.
 		
-		\textcolor{red}{\text{Answer:}Running the python \texttt{src/dataset.py charcorruption} gives the following output(Fig. \ref{fig: 2.e.result}).
+		\textcolor{red}{\textbf{Answer:} Running the python \texttt{src/dataset.py charcorruption} gives the following output(Fig. \ref{fig: 2.e.result}).
 			\begin{figure}[htbp] 
 				% read manual to see what [ht] means and for other possible options
 				\centering 
@@ -546,7 +546,42 @@
 			\end{figure}
 		}
 		
-		
+		\textcolor{blue}{\textbf{Changes:}  Completed the \texttt{\_\_getitem\_\_()} function in \texttt{dataset.py}
+		}
+		\begin{lstlisting}[language=python, basicstyle=\small\ttfamily]
+			def __getitem__(self, idx):
+			# TODO [part e]: see spec above
+			
+			# Steps 0 & 1: truncate
+			document = self.data[idx]
+			document = document[:random.randint(4, int(self.block_size*7/8))]
+			
+			# Prepare mask length and cut index
+			mean_len = round(len(document) / 4)
+			mask_len = mean_len + random.randint(-mean_len, mean_len)
+			clip_idx = random.randint(0, mask_len)
+			
+			# Step 2: prefix, suffix, mc
+			prefix = document[:clip_idx]
+			suffix = document[clip_idx+mask_len:]
+			masked_content = document[clip_idx:clip_idx+mask_len]
+			
+			# Step 3: generate the masked string by taking out masked content
+			masked_string = prefix + self.MASK_CHAR + suffix \ 
+					+ self.MASK_CHAR + masked_content
+			masked_string += self.PAD_CHAR * (self.block_size - len(masked_string))
+			
+			# Step 4: construct in/out
+			input = masked_string[:-1]
+			output = masked_string[1:]
+			
+			# Step 5: encode the input-output pair to a tensor of type long
+			x = torch.tensor([*map(self.stoi.get, input)], dtype=torch.long)
+			y = torch.tensor([*map(self.stoi.get, output)], dtype=torch.long)
+			
+			return x, y
+		\end{lstlisting}
+
 	\item[(f)]
 		(10 points)\textbf{Pretrain, finetune, and make predictions. Budget 2 hours for training.}\\
 		Now fill in the \textit{pretrain} portion of \texttt{run.py}, which will pretrain a model on the span corruption task. Additionally, modify your \textit{finetune} portion to handle finetuning in the case \textit{with} pretraining. In particular, if a path to a pretrained model is provided in the bash command, load this model before finetuning it on the birthplace prediction task.
