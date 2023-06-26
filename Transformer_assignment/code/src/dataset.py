@@ -168,8 +168,34 @@ class CharCorruptionDataset(Dataset):
 
     def __getitem__(self, idx):
         # TODO [part e]: see spec above
-        raise NotImplementedError
 
+        # Steps 0 & 1: truncate
+        document = self.data[idx]
+        document = document[:random.randint(4, int(self.block_size*7/8))]
+
+        # Prepare mask length and cut index
+        mean_len = round(len(document) / 4)
+        mask_len = mean_len + random.randint(-mean_len, mean_len)
+        clip_idx = random.randint(0, mask_len)
+
+        # Step 2: prefix, suffix, mc
+        prefix = document[:clip_idx]
+        suffix = document[clip_idx+mask_len:]
+        masked_content = document[clip_idx:clip_idx+mask_len]
+
+        # Step 3: generate the masked string by taking out masked content
+        masked_string = prefix + self.MASK_CHAR + suffix + self.MASK_CHAR + masked_content
+        masked_string += self.PAD_CHAR * (self.block_size - len(masked_string))
+
+        # Step 4: construct in/out
+        input = masked_string[:-1]
+        output = masked_string[1:]
+
+        # Step 5: encode the input-output pair to a tensor of type long
+        x = torch.tensor([*map(self.stoi.get, input)], dtype=torch.long)
+        y = torch.tensor([*map(self.stoi.get, output)], dtype=torch.long)
+
+        return x, y
 """
 Code under here is strictly for your debugging purposes; feel free to modify
 as desired.
@@ -183,7 +209,7 @@ if __name__ == '__main__':
 
     if args.dataset_type == 'namedata':
         # Even if it hasn't been implemented, we use it to define the vocab
-        corruption_dataset = CharCorruptionDataset(open('wiki.txt', encoding='utf-8-sig').read(), 128)
+        corruption_dataset = CharCorruptionDataset(open('wiki.txt', encoding='utf-8').read(), 128)
         # Make the name dataset
         name_dataset = NameDataset(corruption_dataset,
             open('birth_places_train.tsv').read())
@@ -193,7 +219,7 @@ if __name__ == '__main__':
             print('y:', ''.join([name_dataset.itos[int(c)] for c in y]))
         pass
     elif args.dataset_type == 'charcorruption':
-        corruption_dataset = CharCorruptionDataset(open('wiki.txt', encoding='utf-8-sig').read(), 128)
+        corruption_dataset = CharCorruptionDataset(open('wiki.txt', encoding='utf-8').read(), 128)
         for _, example in zip(range(4), corruption_dataset):
             x, y = example
             print('x:', ''.join([corruption_dataset.itos[int(c)] for c in x]))
