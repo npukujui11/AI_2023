@@ -42,7 +42,9 @@ device = torch.cuda.current_device() if torch.cuda.is_available() else 'cpu'
 # (that is, the same mapping from character to integer, and we build the 
 # vocab from the pretraining corpus.)
 block_size = 128
-text = open(args.pretrain_corpus_path).read()
+# text = open(args.pretrain_corpus_path).read()
+with open(args.pretrain_corpus_path, 'r', encoding='utf-8') as file:
+    text = file.read()
 pretrain_dataset = dataset.CharCorruptionDataset(text, block_size)
 
 # We don't suggest you change these hyperparameters, as they're known to work.
