@@ -332,18 +332,68 @@
 
 	\end{itemize}	
 	
-	\noindent (d) (3 points) \textit{Benefits of multi-headed attention:} Now we'll see some of the power of multi-headed attention. We'll consider a simple version of multi-headed attention which is identical to single-headed self-attention as we've presented it in this homework, except two query vectors ($q_1$ and $q_2$) are defined, which leads to a pair of vectors ($c_1$ and $c_2$), each the output of single-headed attention given its respective query vector. The final output of the multi-headed attention is their average,$\frac{1}{2}(c_1+c_2)$. As in question 1(c), consider a set of key vectors $\{k_1, \ldots , k_n\}$ that are randomly sampled, $k_i \sim \mathcal{N} (\mu_i, \Sigma_i)$, where the means $\mu_i$ are known to you, but the covariances $\Sigma_i$ are unknown. Also as before,	assume that the means µi are mutually orthogonal; $\mu^\top_i \mu_j = 0$ if $i \neq j$, and unit norm,$\|\mu_i\|= 1$.
+	\noindent (d) (3 points) \textbf{Benefits of multi-headed attention:} Now we'll see some of the power of multi-headed attention. We'll consider a simple version of multi-headed attention which is identical to single-headed self-attention as we've presented it in this homework, except two query vectors ($q_1$ and $q_2$) are defined, which leads to a pair of vectors ($c_1$ and $c_2$), each the output of single-headed attention given its respective query vector. The final output of the multi-headed attention is their average,$\frac{1}{2}(c_1+c_2)$. As in question 1(c), consider a set of key vectors $\{k_1, \ldots , k_n\}$ that are randomly sampled, $k_i \sim \mathcal{N} (\mu_i, \Sigma_i)$, where the means $\mu_i$ are known to you, but the covariances $\Sigma_i$ are unknown. Also as before,	assume that the means µi are mutually orthogonal; $\mu^\top_i \mu_j = 0$ if $i \neq j$, and unit norm,$\|\mu_i\|= 1$.
 	
 	\begin{itemize}
 	\item[i.] 
 		(1 point) Assume that the covariance matrices are $\Sigma_i = \alpha I$, for vanishingly small $\alpha$. Design $q_1$
 		and $q_2$ such that $c$ is approximately equal to $\frac{1}{2}(v_a + v_b)$.
+		
+		\textcolor{red}{\text{Answer:} To make $c$ approximately equal to $ \frac {1}{2} (\mathbf{v}_a + \mathbf{v}_b) $, we can design the query vectors $\mathbf{q}_1$ and $\mathbf{q}_2$ such that they are approximately equal to the weights of the target vector $\mathbf{v}_a$ and $\mathbf{v}_b$ in the attention mechanism:
+		\begin{equation*}
+			\begin{aligned}
+				\mathbf{c}_1 \approx \mathbf{v}_a; \quad \mathbf{c}_2 \approx \mathbf{v}_b
+			\end{aligned}
+		\end{equation*}
+		Since the covariance matrix $ \Sigma_i $ is very close to zero, this means that the relationship between the key vectors $k_i$ is very simple and can be considered as a point close to the origin. Therefore, we can choose the query vectors $\mathbf{q}_1$ and $\mathbf{q}_2$ and target vectors $\mathbf{v}_a$ and $\mathbf{v}_b$ and $\mu_b$, we can express the $\mathbf{q}_1$ and $\mathbf{q}_2$:
+		\begin{equation*}
+			\mathbf{q}_1 = \beta \mu_a, \quad \mathbf{q}_2 = \beta \mu_b, \quad \text{for} \ \beta \gg 0
+		\end{equation*}
+		In this case, the output of the attention mechanism, $\mathbf{c}$ would be approximately equal to 
+		\begin{equation*}
+			\mathbf{c} \approx \frac{1}{2} (\mathbf{v}_a + \mathbf{v}_b).
+		\end{equation*}
+		}
 	
 	\item[ii.] 
 		(2 points) Assume that the covariance matrices are $\Sigma_a = \alpha I + \frac{1}{2}(\mu_a \mu_a^\top)$ for vanishingly small $\alpha$, and $\Sigma_i = \alpha I$ for all $i \neq a$. Take the query vectors $q_1$ and $q_2$ that you designed in part i.
 		
 		What, qualitatively, do you expect the output $c$ to look like across different samples of the key
 		vectors? Please briefly explain why. You can ignore cases in which $k^\top_a q_i < 0$.
+		
+		\textcolor{blue}{\textbf{Thoughts:} According to the design of part i, $\mathbf{q}_1 = \mathbf{k}_a$ and $\mathbf{q}_2 = \mathbf{k}_b$, which means that $\mathbf{q}_1$ and $\mathbf{q}_2$ are highly correlated with the corresponding value vectors $\mathbf{v}_a$ and $\mathbf{v}_b$.
+		When we do multi-head attention, each head calculates the weights from its own query vector and gives a weighted average over the value vectors.
+		Because of the presence of $\frac{1}{2} (\mu_a \mu_a^\top) $ in  $\Sigma_a = \alpha I + \frac{1}{2}(\mu_a \mu_a^\top) $, it will increase the weight associated with $\mathbf{v}_a$, while the other query vector $\mathbf{q}_i$ will be less associated with $\mathbf{v}_a$. Therefore, the output $\mathbf{c}$ will prefer $\mathbf{v}_a$ over $\mathbf{v}_b$, and the quality of $\mathbf{c}$ will vary for different critical vector samples. This is because long-head attention is able to weighted average the value vectors according to the correlation of the query vectors, while different query vectors lead to different weighted results.
+		}
+		
+		\textcolor{red}{\textbf{Answer:} With regards to question (c) ii., if we choose $\mathbf{q}_1 = \beta \mu_a$ and $\mathbf{q}_2 = \beta \mu_b$, we get that (note that all other key-query dot products will be insignificant):
+		\begin{equation*}
+			\begin{aligned}
+				\mathbf{k}_a^\top \mathbf{q}_1 \approx \gamma \mu_a^\top \beta \mu_a \approx \gamma \beta, \quad \text{where} \ \beta \gg 0
+			\end{aligned}
+		\end{equation*}
+		\begin{equation*}
+			\begin{aligned}
+				\mathbf{k}_b^\top \mathbf{q}_2 \approx \mu_b^\top \beta  \mu_b \approx \beta, \quad \text{where} \ \beta \gg 0
+			\end{aligned}
+		\end{equation*}
+		We can solve for $\alpha$ values (again, note that all other key-query dot products will be insignificant when $\beta$ is large):
+		\begin{equation*}
+			\begin{aligned}
+				\alpha_{a1} \approx \frac{\exp(\gamma\beta)}{\exp(\gamma\beta)} \approx 1; \quad \alpha_{b2} \approx \frac{\exp(\beta)}{\exp(\beta)} \approx 1;
+			\end{aligned}
+		\end{equation*}
+		Since we can say that $\alpha_{i1} \approx 0$ for any $i\neq a$ and $\alpha_{i2} \approx 0$ for any $i\neq b$ is is easy to see that:
+		\begin{equation*}
+			\begin{aligned}
+				\mathbf{c}_1 \approx \mathbf{v}_a, \quad \mathbf{c}_2 \approx \mathbf{v}_b
+			\end{aligned}
+		\end{equation*}
+		Which means that the final output will always approximately be an average of the values:
+		\begin{equation*}
+			\mathbf{c} \approx \frac{1}{2} (\mathbf{v}_a + \mathbf{v}_b).
+		\end{equation*}
+		}
 	\end{itemize}	
 	
 	\section{Pretrained Transformer models and knowledge access (35 points)}
@@ -441,7 +491,7 @@
 		Now fill in the \textit{pretrain} portion of \texttt{run.py}, which will pretrain a model on the span corruption task. Additionally, modify your \textit{finetune} portion to handle finetuning in the case \textit{with} pretraining. In particular, if a path to a pretrained model is provided in the bash command, load this model before finetuning it on the birthplace prediction task.
 		Pretrain your model on \texttt{wiki.txt} (which should take approximately two hours), finetune it on \texttt{NameDataset} and evaluate it. Specifically, you should be able to run the following four commands:
 		(Don't be concerned if the loss appears to plateau in the middle of pretraining; it will eventually go back down.)
-		\begin{lstlisting}[language=bash]
+		\begin{lstlisting}[basicstyle=\ttfamily, language=bash]
 			# Pretrain the model
 			python src/run.py pretrain vanilla wiki.txt \
 			--writing_params_path vanilla.pretrain.params
@@ -471,7 +521,7 @@
 		(10 points)\textbf{Research! Write and try out a more efficient variant of Attention (Budget 2 hours for pretraining!)}\\
 		
 		We'll now go to changing the Transformer architecture itself -- specifically the first and last transformer blocks.
-		While we've been using a self-attention scoring function based on dot products, this involves a rather intensive computation that's quadratic in the sequence length. This is because the dot product between $\ell^2$ pairs of word vectors is computed in each computation. \textit{Synthesized attention} \cite{b3} is a very recent alternative that has potential benefits by removing this dot product (and quadratic computation) entirely. It's a promising idea, and one way for us to ask, "What's important/right about the Transformer architecture, and where can we improve/prune aspects of it?" In \texttt{attention.py}, implement the forward() method of SynthesizerAttention, which implements a variant of the Synthesizer proposed in the cited paper.
+		While we've been using a self-attention scoring function based on dot products, this involves a rather intensive computation that's quadratic in the sequence length. This is because the dot product between $\ell^2$ pairs of word vectors is computed in each computation. \textit{Synthesized attention} \cite{b3} is a very recent alternative that has potential benefits by removing this dot product (and quadratic computation) entirely. It's a promising idea, and one way for us to ask, "What's important/right about the Transformer architecture, and where can we improve/prune aspects of it?" In \texttt{attention.py}, implement the \texttt{forward()} method of \texttt{SynthesizerAttention}, which implements a variant of the Synthesizer proposed in the cited paper.
 		
 		The provided \texttt{CausalSelfAttention} layer implements the following attention for each head of the multi-headed attention: Let $X\in \mathbb{R}^{\ell \times d}$ (where $\ell$ is the block size and $d$ is the total dimensionality, $d/h$ is the dimensionality per head.).\footnote{Note that these dimensionalities do not include the minibatch dimension.}
 		
@@ -496,11 +546,10 @@
 		\end{equation}
 		where $A_i \in \mathbf{R}^{d\times d/h}$, $B_i \in \mathbf{R}^{d/h \times \ell}$, and $V_i \in \mathbf{R}^{d \times d/h}$.\footnote{Hint: copy over the CausalSelfAttention class, and modify it minimally for this.} One way to interpret this is as follows: The term $(XQ_i)(XK_i)^\top$ is an $\ell \times \ell$ matrix of attention scores, computed as all pairs of dot products between word embeddings. The synthesizer variant eschews the all-pairs dot product and directly computes the $\ell \times \ell$ matrix of attention scores by mapping each d-dimensional vector of each head for $X$ to an $\ell$-dimesional vector of unnormalized attention weights.
 		
-		In the rest of the code in the src/ folder, modify your model to support using either CausalSelfAttention or SynthesizerAttention. Add the ability to switch between these attention variants depending on whether "vanilla" (for causal self-attention) or "synthesizer" (for the synthesizer variant) is selected in the command line arguments (see the section marked [part g] in src/run.py). You are free to implement this functionality in any way you choose, so long as it supports these command line arguments.
+		In the rest of the code in the \texttt{src}/ folder, modify your model to support using either \texttt{CausalSelfAttention} or \texttt{SynthesizerAttention}. Add the ability to switch between these attention variants depending on whether "vanilla" (for causal self-attention) or "synthesizer" (for the synthesizer variant) is selected in the command line arguments (see the section marked [part g] in \texttt{src/run.py}). You are free to implement this functionality in any way you choose, so long as it supports these command line arguments.
 		
 		Below are bash commands that your code should support in order to pretrain the model, finetune it, and make predictions on the dev and test sets.
 		Note that the pretraining process will take approximately 2 hours. 
-		\clearpage
 		\begin{lstlisting}[basicstyle=\ttfamily, language=bash]
 			
 			# Pretrain the model
@@ -544,7 +593,7 @@
 		\item[(a)]
 			(1 point) Succinctly explain why the pretrained (vanilla) model was able to achieve an accuracy of above 10\%, whereas the non-pretrained model was not.
 		\item[(b)]
-			(2 points) Take a look at some of the correct predictions of the pretrain+finetuned vanilla model, as well as some of the errors. We think you'll find that it's impossible to tell, just looking at the output, whether the model retrieved the correct birth place, or made up an incorrect birth place. Consider the implications of this for user-facing systems that involve pretrained NLP components. Come up with two distinct reasons why this model behavior (i.e. unable to tell whether it's retrieved or made up) may cause concern for such applications, and an example for each reason.
+			(2 points) Take a look at some of the correct predictions of the pretrain+finetuned vanilla model, as well as some of the errors. We think you'll find that it's impossible to tell, just looking at the output, whether the model retrieved the correct birth place, or made up an incorrect birth place. Consider the implications of this for user-facing systems that involve pretrained NLP components. Come up with two \textbf{distinct} reasons why this model behavior (i.e. unable to tell whether it's retrieved or made up) may cause concern for such applications, and an example for each reason.
 		\item[(c)] 
 			(2 points) If your model didn't see a person's name at pretraining time, and that person was not seen at fine-tuning time either, it is not possible for it to have “learned” where they lived. Yet, your model will produce something as a predicted birth place for that person's name if asked. Concisely describe a strategy your model might take for predicting a birth place for that person's name, and one reason why this should cause concern for the use of such applications. (You do not need to submit the same answer for 3c as for 3b.)
 	\end{itemize}
