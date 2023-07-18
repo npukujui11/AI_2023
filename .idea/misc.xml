@@ -1,8 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
 <<<<<<< Updated upstream
+<<<<<<< HEAD
+=======
+  <component name="ProjectRootManager" version="2" project-jdk-name="tf2 (4)" project-jdk-type="Python SDK" />
+=======
+<<<<<<< HEAD
+<<<<<<< Updated upstream
+>>>>>>> main
   <component name="ProjectRootManager" version="2" project-jdk-name="tf2 (2)" project-jdk-type="Python SDK" />
 =======
   <component name="ProjectRootManager" version="2" project-jdk-name="paddlepaddle" project-jdk-type="Python SDK" />
 >>>>>>> Stashed changes
+<<<<<<< HEAD
+=======
+=======
+  <component name="ProjectRootManager" version="2" project-jdk-name="tf2 (4)" project-jdk-type="Python SDK" />
+>>>>>>> main
+>>>>>>> Stashed changes
+>>>>>>> main
 </project>

@@ -3,10 +3,24 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$" />
 <<<<<<< Updated upstream
+<<<<<<< HEAD
+=======
+    <orderEntry type="jdk" jdkName="tf2 (4)" jdkType="Python SDK" />
+=======
+<<<<<<< HEAD
+<<<<<<< Updated upstream
+>>>>>>> main
     <orderEntry type="jdk" jdkName="tf2 (2)" jdkType="Python SDK" />
 =======
     <orderEntry type="jdk" jdkName="paddlepaddle" jdkType="Python SDK" />
 >>>>>>> Stashed changes
+<<<<<<< HEAD
+=======
+=======
+    <orderEntry type="jdk" jdkName="tf2 (4)" jdkType="Python SDK" />
+>>>>>>> main
+>>>>>>> Stashed changes
+>>>>>>> main
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>
